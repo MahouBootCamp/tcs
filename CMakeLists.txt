@@ -10,6 +10,7 @@ add_subdirectory(libtcs)
 add_subdirectory(googletest)
 
 add_executable(tcs_unit_test
+    src/map_builder_test.cc
     src/map_test.cc
 )
 target_link_libraries(tcs_unit_test 

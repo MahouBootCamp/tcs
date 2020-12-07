@@ -6,14 +6,14 @@
 #include <memory>
 #include <mutex>
 
-#include "tcs/controller_pool.h"
 #include "tcs/idispatcher.h"
 #include "tcs/ikernal.h"
 #include "tcs/irouter.h"
 #include "tcs/ischeduler.h"
 #include "tcs/ivehicle_controller.h"
-#include "tcs/map.h"
-#include "tcs/order_pool.h"
+#include "tcs/util/controller_pool.h"
+#include "tcs/util/map.h"
+#include "tcs/util/order_pool.h"
 
 namespace tcs {
 

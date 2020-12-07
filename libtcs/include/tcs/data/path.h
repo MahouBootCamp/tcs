@@ -16,9 +16,15 @@ class Path : public MapResource {
         destination_(destination),
         length_(length) {}
 
+  MapObjectID get_source() { return source_; }
+  MapObjectID get_destination() { return destination_; }
+  double get_length() { return length_; }
+  void set_length(double length) { length_ = length; }
+
  private:
   MapObjectID source_;
   MapObjectID destination_;
+  // Length of path. MUST BE POSITIVE.
   double length_;
 };
 

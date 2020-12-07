@@ -15,8 +15,7 @@ class MapResource : public MapObject {
   MapObjectRef block_ref_;
 };
 
-inline bool IsResource(MapObject* object) {
-  auto type = object->get_type();
+inline bool IsResource(MapObjectType type) {
   return type == MapObjectType::kPoint || type == MapObjectType::kPath ||
          type == MapObjectType::kLocation;
 }

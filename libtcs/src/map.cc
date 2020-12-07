@@ -1,0 +1,43 @@
+#include "tcs/util/map.h"
+
+namespace tcs {
+
+MapResource* Map::get_resource(MapObjectID id) {
+  auto itr = object_pool_.find(id);
+  if (itr == object_pool_.end() || !IsResource(itr->second->get_type()))
+    return nullptr;
+  else
+    return static_cast<MapResource*>(itr->second.get());
+}
+
+Point* Map::get_point(MapObjectID id) {
+  return point_ids_.find(id) == point_ids_.end()
+             ? nullptr
+             : static_cast<Point*>(object_pool_[id].get());
+}
+
+Path* Map::get_path(MapObjectID id) {
+  return path_ids_.find(id) == path_ids_.end()
+             ? nullptr
+             : static_cast<Path*>(object_pool_[id].get());
+}
+
+Location* Map::get_location(MapObjectID id) {
+  return location_ids_.find(id) == location_ids_.end()
+             ? nullptr
+             : static_cast<Location*>(object_pool_[id].get());
+}
+
+Block* Map::get_block(MapObjectID id) {
+  return block_ids_.find(id) == block_ids_.end()
+             ? nullptr
+             : static_cast<Block*>(object_pool_[id].get());
+}
+
+Vehicle* Map::get_vehicle(MapObjectID id) {
+  return vehicle_ids_.find(id) == vehicle_ids_.end()
+             ? nullptr
+             : static_cast<Vehicle*>(object_pool_[id].get());
+}
+
+}  // namespace tcs
