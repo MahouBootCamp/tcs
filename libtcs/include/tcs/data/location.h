@@ -10,6 +10,7 @@ namespace tcs {
 const std::string kParkOperation = "Park";
 const std::string kChargeOperation = "Charge";
 
+// A Location is a set of points where AGVs can execute a set of operations
 class Location : public MapResource {
  public:
   Location(MapObjectID id, std::unordered_set<std::string> operations,

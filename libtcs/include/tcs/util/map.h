@@ -14,6 +14,7 @@
 
 namespace tcs {
 
+// A Map manages all MapObjcets
 class Map {
   friend class MapBuilder;
 
@@ -26,6 +27,9 @@ class Map {
   Vehicle* get_vehicle(MapObjectID id);
 
  private:
+  // Map can only be constructed from its builder
+  Map() = default;
+
   std::unordered_map<MapObjectID, std::unique_ptr<MapObject>> object_pool_;
   std::unordered_set<MapObjectID> point_ids_;
   std::unordered_set<MapObjectID> path_ids_;

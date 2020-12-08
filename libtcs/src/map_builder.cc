@@ -106,7 +106,7 @@ void MapBuilder::AddBlock(MapObjectID id,
   map_->block_ids_.insert(id);
   map_->object_pool_.insert({id, std::move(ptr)});
   for (auto& res_ptr : resource_vec) {
-    res_ptr->set_block(id);
+    res_ptr->AddBlock(id);
   }
 }
 
@@ -162,16 +162,8 @@ void MapBuilder::AddToBlock(MapObjectID resource, MapObjectID block) {
   if (!resouce_ptr) throw std::invalid_argument("Resource id not exist");
   if (!block_ptr) throw std::invalid_argument("Block id not exist");
 
-  auto block_ref = resouce_ptr->get_block();
-  if (block_ref.has_value()) {
-    if (block_ref.value() == block)
-      return;
-    else
-      RemoveFromBlock(resource, block_ref.value());
-  }
-
   block_ptr->AddResource(resource);
-  resouce_ptr->set_block(block);
+  resouce_ptr->AddBlock(block);
 }
 
 void MapBuilder::RemoveFromBlock(MapObjectID resource, MapObjectID block) {
@@ -181,32 +173,33 @@ void MapBuilder::RemoveFromBlock(MapObjectID resource, MapObjectID block) {
   if (!resouce_ptr) throw std::invalid_argument("Resource id not exist");
   if (!block_ptr) throw std::invalid_argument("Block id not exist");
 
-  if (resouce_ptr->get_block().has_value() &&
-      resouce_ptr->get_block().value() == block) {
-    resouce_ptr->set_block(std::nullopt);
+  if (block_ptr->get_resources().find(resource) ==
+      block_ptr->get_resources().end()) {
+    throw std::invalid_argument("Resource not in block");
+  } else {
     block_ptr->RemoveResource(resource);
-  } else
-    throw std::invalid_argument("Resource not belong to block");
+    resouce_ptr->RemoveBlock(block);
+  }
 }
 
 void MapBuilder::RemovePoint(MapObjectID id) {
   auto point_ptr = map_->get_point(id);
   if (!point_ptr) throw std::invalid_argument("Point id not exist");
 
-  if (point_ptr->get_block().has_value()) {
-    RemoveFromBlock(id, point_ptr->get_block().value());
-  }
-
   if (point_ptr->get_linked_location().has_value()) {
     Unlink(id, point_ptr->get_linked_location().value());
   }
 
+  for (auto& block : point_ptr->get_blocks()) {
+    map_->get_block(block)->RemoveResource(id);
+  }
+
   std::unordered_set<MapObjectID> in_paths{point_ptr->get_in_paths()};
   std::unordered_set<MapObjectID> out_paths{point_ptr->get_out_paths()};
-  for (auto path : in_paths) {
+  for (auto& path : in_paths) {
     RemovePath(path);
   }
-  for (auto path : out_paths) {
+  for (auto& path : out_paths) {
     RemovePath(path);
   }
 
@@ -218,8 +211,8 @@ void MapBuilder::RemovePath(MapObjectID id) {
   auto path_ptr = map_->get_path(id);
   if (!path_ptr) throw std::invalid_argument("Path id not exist");
 
-  if (path_ptr->get_block().has_value()) {
-    RemoveFromBlock(id, path_ptr->get_block().value());
+  for (auto& block : path_ptr->get_blocks()) {
+    map_->get_block(block)->RemoveResource(id);
   }
 
   map_->get_point(path_ptr->get_source())->RemoveOutPath(id);
@@ -232,8 +225,8 @@ void MapBuilder::RemoveLocation(MapObjectID id) {
   auto location_ptr = map_->get_location(id);
   if (!location_ptr) throw std::invalid_argument("Location id not exist");
 
-  if (location_ptr->get_block().has_value()) {
-    RemoveFromBlock(id, location_ptr->get_block().value());
+  for (auto& block : location_ptr->get_blocks()) {
+    map_->get_block(block)->RemoveResource(id);
   }
 
   for (auto& point_id : location_ptr->get_linked_points()) {
@@ -249,7 +242,7 @@ void MapBuilder::RemoveBlock(MapObjectID id) {
   if (!block_ptr) throw std::invalid_argument("Block id not exist");
 
   for (auto& resource_id : block_ptr->get_resources()) {
-    map_->get_resource(resource_id)->set_block(std::nullopt);
+    map_->get_resource(resource_id)->RemoveBlock(id);
   }
 
   map_->block_ids_.erase(id);

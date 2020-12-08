@@ -20,6 +20,7 @@ enum class PointType {
   kReport  // Vehicles must report upon arriving a Report Point
 };
 
+// Points are positions on map
 class Point : public MapResource {
  public:
   Point(MapObjectID id, Coordinate coordinate, PointType type)

@@ -1,18 +1,23 @@
 #ifndef MAP_RESOURCE_H
 #define MAP_RESOURCE_H
 
+#include <unordered_set>
+
 #include "tcs/data/map_object.h"
 
 namespace tcs {
 
+// MapResource would be assigned to vehicles.
+// A MapResource can only be assigned to one vehicle at the same time.
 class MapResource : public MapObject {
  public:
   MapResource(MapObjectID id, MapObjectType type) : MapObject(id, type) {}
-  MapObjectRef get_block() const { return block_ref_; }
-  void set_block(MapObjectRef block) { block_ref_ = block; }
+  const std::unordered_set<MapObjectID>& get_blocks() const { return blocks_; }
+  void AddBlock(MapObjectID block) { blocks_.insert(block); }
+  void RemoveBlock(MapObjectID block) { blocks_.erase(block); }
 
  private:
-  MapObjectRef block_ref_;
+  std::unordered_set<MapObjectID> blocks_;
 };
 
 inline bool IsResource(MapObjectType type) {

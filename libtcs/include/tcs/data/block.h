@@ -7,6 +7,8 @@
 
 namespace tcs {
 
+// A Block is a set of resources that would be assigned to one vehicle at the
+// same time
 class Block : public MapObject {
  public:
   Block(MapObjectID id, std::unordered_set<MapObjectID> resources)

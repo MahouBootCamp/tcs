@@ -8,6 +8,7 @@
 
 namespace tcs {
 
+// Map's builder
 class MapBuilder {
  public:
   static MapBuilder& GetInstance() {
@@ -15,8 +16,10 @@ class MapBuilder {
     return instance;
   }
 
+  // Call after a build if you want to create a new map
   void Init();
 
+  // Build a map
   Map* Build();
 
   Map* BuildFromFile(std::string file_path) {
@@ -50,7 +53,7 @@ class MapBuilder {
   void RemoveVehicle(MapObjectID id);
 
  private:
-  MapBuilder() = default;
+  MapBuilder() { Init(); }
   void AddPoint(MapObjectID id, Coordinate coordinate, PointType type);
   void AddPath(MapObjectID id, MapObjectID source, MapObjectID destination,
                double length);
@@ -59,7 +62,7 @@ class MapBuilder {
   void AddBlock(MapObjectID id, std::unordered_set<MapObjectID> resources);
   void AddVehicle(MapObjectID id);
 
-  Map* map_;
+  Map* map_ = nullptr;
   MapObjectID next_id_ = 0;
 };
 

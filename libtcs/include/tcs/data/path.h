@@ -7,6 +7,7 @@
 
 namespace tcs {
 
+// A Path is an abstract route between Points with a direction
 class Path : public MapResource {
  public:
   Path(MapObjectID id, MapObjectID source, MapObjectID destination,
