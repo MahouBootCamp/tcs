@@ -12,13 +12,36 @@ namespace tcs {
 template <class... Args>
 class Event {
  public:
-  Event(std::function<void(Args...)> handler) : handler_{handler} {}
+  Event() = default;
+  // Event(std::function<void(Args...)> handler) : handler_{handler} {}
+
+  std::size_t Subscribe(std::function<void(Args...)> handler) {
+    std::scoped_lock<std::mutex> lk{mut_};
+    auto index = handlers_.size();
+    handlers_.push_back(handler);
+    return index;
+  }
+
+  void Unsubscribe(std::size_t index) {
+    std::scoped_lock<std::mutex> lk{mut_};
+    auto itr = handlers_.begin();
+    for (size_t i = 0; i != index; ++i) {
+      itr++;
+    }
+    handlers_.erase(itr);
+  }
+
   void Fire(Args&&... args) {
     std::scoped_lock<std::mutex> lk{mut_};
-    futures_.push_back(
-        std::async(std::launch::async, handler_, std::forward<Args>(args)...));
+    for (auto& handler : handlers_) {
+      futures_.push_back(
+          std::async(std::launch::async, handler, std::forward<Args>(args)...));
+      // futures_.push_back(std::async(std::launch::async, std::ref(handler),
+      //                               std::forward<Args>(args)...));
+    }
     CheckStatus();
   }
+
   ~Event() {
     std::scoped_lock<std::mutex> lk{mut_};
     for (auto& fut : futures_) {
@@ -38,7 +61,7 @@ class Event {
   }
 
   mutable std::mutex mut_;
-  std::function<void(Args...)> handler_;
+  std::list<std::function<void(Args...)>> handlers_;
   std::list<std::future<void>> futures_;
 };
 

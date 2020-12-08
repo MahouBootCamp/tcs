@@ -7,6 +7,7 @@
 
 namespace tcs {
 
+const std::string kNoOperation = "";
 const std::string kParkOperation = "Park";
 const std::string kChargeOperation = "Charge";
 
