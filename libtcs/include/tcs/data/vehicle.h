@@ -25,7 +25,7 @@ enum class IntegrationLevel {
 enum class ProcessState { kIdle, kAwaitingOrder, kProcessingOrder };
 
 class Vehicle : public MapObject {
-  // REVIEW: Should vehicle be a map element?
+  // REVIEW: Should vehicle be a map object?
  public:
   Vehicle(MapObjectID id) : MapObject(id, MapObjectType::kVehicle) {}
 
