@@ -21,7 +21,7 @@ class OrderPool {
 
   TransportOrder* get_order(TransportOrderID);
   TransportOrderID AddOrder(
-      std::vector<DriveOrder> drive_orders,
+      std::vector<Destination> destinations,
       std::unordered_set<TransportOrderID> dependencies = {});
 
  private:

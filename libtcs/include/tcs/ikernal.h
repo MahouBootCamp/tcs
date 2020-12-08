@@ -14,7 +14,7 @@ class IKernal {
   virtual void Exit() = 0;
   virtual void SetVehicleController() = 0;
   virtual TransportOrderID AddTransportOrder(
-      std::vector<DriveOrder> drive_orders,
+      std::vector<Destination> destinations,
       std::unordered_set<TransportOrderID> dependencies = {}) = 0;
   virtual void WithdrawTransportOrder(TransportOrderID id, bool immediate) = 0;
   virtual ~IKernal() {}

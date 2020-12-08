@@ -29,7 +29,7 @@ class IRouter {
   virtual void SelectRoute(Vehicle* vehicle,
                            std::list<DriveOrder>& drive_orders) = 0;
   // Get cached routes
-  virtual std::unordered_map<Vehicle*, std::list<DriveOrder>&>
+  virtual std::unordered_map<Vehicle*, std::list<DriveOrder>&>&
   GetSelectedRoutes() = 0;
   // Get targeted points from cache.
   // These points would not be targeted by parking or charging commands.

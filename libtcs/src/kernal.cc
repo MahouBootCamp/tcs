@@ -25,9 +25,9 @@ void Kernal::Exit() {
 void Kernal::SetVehicleController() {}
 
 TransportOrderID Kernal::AddTransportOrder(
-    std::vector<DriveOrder> drive_orders,
+    std::vector<Destination> destinations,
     std::unordered_set<TransportOrderID> dependencies) {
-  return order_pool_->AddOrder(drive_orders, dependencies);
+  return order_pool_->AddOrder(destinations, dependencies);
   // UNDONE: Further dispatch task
 }
 

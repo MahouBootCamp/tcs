@@ -12,11 +12,11 @@ TransportOrder* OrderPool::get_order(TransportOrderID id) {
 }
 
 TransportOrderID OrderPool::AddOrder(
-    std::vector<DriveOrder> drive_orders,
+    std::vector<Destination> destinations,
     std::unordered_set<TransportOrderID> dependencies) {
   // Check validity
-  for (auto& order : drive_orders) {
-    auto site = map_->get_resource(order.get_destination().site);
+  for (auto& dst : destinations) {
+    auto site = map_->get_resource(dst.site);
     if (!site || site->get_type() == MapObjectType::kPath)
       throw std::invalid_argument("Destination invalid");
   }
@@ -28,7 +28,7 @@ TransportOrderID OrderPool::AddOrder(
 
   // std::scoped_lock<std::recursive_mutex> lk{mut_};
   auto ptr =
-      std::make_unique<TransportOrder>(next_id_, drive_orders, dependencies);
+      std::make_unique<TransportOrder>(next_id_, destinations, dependencies);
   order_pool_.insert({next_id_, std::move(ptr)});
   auto tmp = next_id_;
   next_id_ += 1;

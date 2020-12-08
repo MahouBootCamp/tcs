@@ -24,9 +24,23 @@ enum class TransportOrderState {
 
 class TransportOrder {
  public:
-  TransportOrder(TransportOrderID id, std::vector<DriveOrder> drive_orders,
+  // TransportOrder(TransportOrderID id, std::vector<DriveOrder> drive_orders,
+  //                std::unordered_set<TransportOrderID> dependencies)
+  //     : id_(id), drive_orders_(drive_orders), dependencies_(dependencies) {}
+
+  TransportOrder(TransportOrderID id, std::vector<Destination> destinations,
                  std::unordered_set<TransportOrderID> dependencies)
-      : id_(id), drive_orders_(drive_orders), dependencies_(dependencies) {}
+      : id_(id), dependencies_(dependencies) {
+    for (auto&& dst : destinations) {
+      drive_orders_.push_back(dst);
+    }
+  }
+
+  TransportOrderID get_id() { return id_; }
+  std::vector<DriveOrder>& get_drive_orders() { return drive_orders_; }
+  std::unordered_set<TransportOrderID>& get_dependencies() {
+    return dependencies_;
+  }
 
  private:
   TransportOrderID id_;

@@ -14,6 +14,8 @@ add_library(libtcs
     src/map_builder.cc
     src/map.cc
     src/order_pool.cc
+    src/router.cc
+    src/shortest_algorithm.cc
 )
 
 target_include_directories(libtcs

@@ -26,6 +26,13 @@ class Map {
   Block* get_block(MapObjectID id);
   Vehicle* get_vehicle(MapObjectID id);
 
+  std::unordered_set<MapResource*> GetAllResources();
+  std::unordered_set<Point*> GetAllPoints();
+  std::unordered_set<Path*> GetAllPaths();
+  std::unordered_set<Location*> GetAllLocations();
+  std::unordered_set<Block*> GetAllBlocks();
+  std::unordered_set<Vehicle*> GetAllVehicles();
+
   // TODO: Add functions that retrive a bunch of objects
 
  private:

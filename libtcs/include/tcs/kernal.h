@@ -33,7 +33,7 @@ class Kernal : public IKernal {
   void SetVehicleController() override;
 
   TransportOrderID AddTransportOrder(
-      std::vector<DriveOrder> drive_orders,
+      std::vector<Destination> destinations,
       std::unordered_set<TransportOrderID> dependencies = {}) override;
 
   void WithdrawTransportOrder(TransportOrderID id, bool immediate) override;
