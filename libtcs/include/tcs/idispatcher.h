@@ -2,7 +2,7 @@
 #define IDISPATCHER_H
 
 #include "tcs/data/vehicle.h"
-#include "tcs/order.h"
+#include "tcs/order/transport_order.h"
 
 namespace tcs {
 

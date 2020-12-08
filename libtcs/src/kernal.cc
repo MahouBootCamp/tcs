@@ -24,6 +24,13 @@ void Kernal::Exit() {
 
 void Kernal::SetVehicleController() {}
 
-void Kernal::AddTransportOrder() {}
+TransportOrderID Kernal::AddTransportOrder(
+    std::vector<DriveOrder> drive_orders,
+    std::unordered_set<TransportOrderID> dependencies) {
+  return order_pool_->AddOrder(drive_orders, dependencies);
+  // UNDONE: Further dispatch task
+}
+
+void Kernal::WithdrawTransportOrder(TransportOrderID id, bool immediate) {}
 
 }  // namespace tcs

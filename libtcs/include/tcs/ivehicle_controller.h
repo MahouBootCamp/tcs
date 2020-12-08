@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "tcs/data/map_resource.h"
-#include "tcs/order.h"
+#include "tcs/order/transport_order.h"
 
 namespace tcs {
 

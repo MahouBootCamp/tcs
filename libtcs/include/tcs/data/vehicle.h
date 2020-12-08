@@ -2,7 +2,7 @@
 #define VEHICLE_H
 
 #include "tcs/data/map_object.h"
-#include "tcs/order.h"
+#include "tcs/order/transport_order.h"
 
 namespace tcs {
 

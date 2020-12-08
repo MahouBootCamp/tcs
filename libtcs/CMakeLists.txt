@@ -13,6 +13,7 @@ add_library(libtcs
     src/kernal.cc
     src/map_builder.cc
     src/map.cc
+    src/order_pool.cc
 )
 
 target_include_directories(libtcs
