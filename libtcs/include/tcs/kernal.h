@@ -6,20 +6,23 @@
 #include <memory>
 #include <mutex>
 
-#include "tcs/idispatcher.h"
+#include "tcs/dispatcher/idispatcher.h"
 #include "tcs/ikernal.h"
-#include "tcs/irouter.h"
-#include "tcs/ischeduler.h"
-#include "tcs/ivehicle_controller.h"
+#include "tcs/router/irouter.h"
+#include "tcs/scheduler/ischeduler.h"
 #include "tcs/util/controller_pool.h"
+#include "tcs/util/executor.h"
 #include "tcs/util/map.h"
 #include "tcs/util/order_pool.h"
+#include "tcs/vehicle/ivehicle_controller.h"
 
 namespace tcs {
 
+const std::size_t kExecutorThreads = 1;
+
 class Kernal : public IKernal {
  public:
-  Kernal() {}
+  Kernal() : executor_(kExecutorThreads) {}
   ~Kernal();
 
   KernalState get_state() override { return state_; }
@@ -46,6 +49,7 @@ class Kernal : public IKernal {
   std::unique_ptr<IRouter> router_;
   std::unique_ptr<IDispatcher> dispatcher_;
   std::unique_ptr<IScheduler> scheduler_;
+  Executor executor_;
 };
 
 }  // namespace tcs

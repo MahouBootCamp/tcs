@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "tcs/data/map_resource.h"
-#include "tcs/ivehicle_controller.h"
+#include "tcs/vehicle/ivehicle_controller.h"
 
 namespace tcs {
 
