@@ -26,6 +26,8 @@ class Map {
   Block* get_block(MapObjectID id);
   Vehicle* get_vehicle(MapObjectID id);
 
+  // TODO: Add functions that retrive a bunch of objects
+
  private:
   // Map can only be constructed from its builder
   Map() = default;

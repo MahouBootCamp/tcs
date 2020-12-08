@@ -8,6 +8,8 @@ int main(int, char**) {
   // Create transport orders
   // Exit
 
+  // TODO: Tighten const check on whole project
+
   std::unique_ptr<tcs::IKernal> kernal{new tcs::Kernal{}};
   kernal->Start();
   std::this_thread::sleep_for(std::chrono::seconds(2));
