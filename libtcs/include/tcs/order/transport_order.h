@@ -38,6 +38,12 @@ class TransportOrder {
 
   TransportOrderID get_id() { return id_; }
   std::vector<DriveOrder>& get_drive_orders() { return drive_orders_; }
+
+  std::vector<DriveOrder> GetFutureDriveOrders() {
+    return std::vector<DriveOrder>(
+        drive_orders_.begin() + next_drive_order_index_, drive_orders_.end());
+  }
+
   std::unordered_set<TransportOrderID>& get_dependencies() {
     return dependencies_;
   }

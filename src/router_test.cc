@@ -80,16 +80,29 @@ TEST_F(RouterTest, AlgorithmTest) {
   ASSERT_EQ(routesz->get_steps().size(), 2);
 }
 
-// TEST_F(RouterTest, PointToPoint) {
-//   auto order = order_pool_->AddOrder({{17, "Load"}, {18, "Unload"}});
-//   ASSERT_TRUE(router_->ChechRoutability(order_pool_->get_order(order)));
-// }
+TEST_F(RouterTest, PointToPoint) {
+  auto order = order_pool_->AddOrder({{17, "Load"}, {18, "Unload"}});
+  ASSERT_TRUE(router_->ChechRoutability(order_pool_->get_order(order)));
+}
 
-// TEST_F(RouterTest, LocationToLocation) {
-//   auto order0 = order_pool_->AddOrder({{19, "Load"}, {20, "Unload"}});
-//   auto order1 = order_pool_->AddOrder({{17, "Load"}, {21, "Unload"}});
-//   auto order2 = order_pool_->AddOrder({{22, "Load"}, {23, "Unload"}});
-//   ASSERT_TRUE(router_->ChechRoutability(order_pool_->get_order(order0)));
-//   ASSERT_FALSE(router_->ChechRoutability(order_pool_->get_order(order1)));
-//   ASSERT_TRUE(router_->ChechRoutability(order_pool_->get_order(order2)));
-// }
+TEST_F(RouterTest, LocationToLocation) {
+  auto order0 = order_pool_->AddOrder({{19, "Load"}, {20, "Unload"}});
+  auto order1 = order_pool_->AddOrder({{17, "Load"}, {21, "Unload"}});
+  auto order2 = order_pool_->AddOrder({{22, "Load"}, {23, "Unload"}});
+  auto order3 = order_pool_->AddOrder(
+      {{22, "Load"}, {23, "Unload"}, {19, "Load"}, {20, "Unload"}});
+  ASSERT_TRUE(router_->ChechRoutability(order_pool_->get_order(order0)));
+  ASSERT_FALSE(router_->ChechRoutability(order_pool_->get_order(order1)));
+  ASSERT_TRUE(router_->ChechRoutability(order_pool_->get_order(order2)));
+  ASSERT_TRUE(router_->ChechRoutability(order_pool_->get_order(order3)));
+}
+
+TEST_F(RouterTest, TransportOrder) {
+  auto pvx = map_->get_point(2);
+  auto order0 = order_pool_->AddOrder(
+      {{22, "Load"}, {23, "Unload"}, {19, "Load"}, {20, "Unload"}});
+  auto route = router_->GetRoute(pvx, order_pool_->get_order(order0));
+  ASSERT_TRUE(route.has_value());
+}
+
+// TODO: More test on unroutable condition

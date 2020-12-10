@@ -15,6 +15,7 @@
 namespace tcs {
 
 // A Map manages all MapObjcets
+// Review: Wrap it with a service class and add concurrent protection?
 class Map {
   friend class MapBuilder;
 
@@ -33,7 +34,7 @@ class Map {
   std::unordered_set<Block*> GetAllBlocks();
   std::unordered_set<Vehicle*> GetAllVehicles();
 
-  // TODO: Add functions that retrive a bunch of objects
+  // Review: Add functions that retrive a set of objects by a set of ids?
 
  private:
   // Map can only be constructed from its builder
