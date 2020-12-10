@@ -9,7 +9,7 @@
 using namespace tcs;
 using namespace std;
 
-Map* ProductDefaultTestModel() {
+Map* ProductOrderPoolTestMap() {
   auto builder = MapBuilder::GetInstance();
   builder.Init();
 
@@ -38,7 +38,7 @@ Map* ProductDefaultTestModel() {
 
 class OrderPoolTest : public ::testing::Test {
  protected:
-  void SetUp() override { map_.reset(ProductDefaultTestModel()); }
+  void SetUp() override { map_.reset(ProductOrderPoolTestMap()); }
   unique_ptr<Map> map_;
 };
 

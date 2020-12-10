@@ -1,6 +1,0 @@
-#ifndef SHORTEST_ALGORITHM_H
-#define SHORTEST_ALGORITHM_H
-
-
-
-#endif /* SHORTEST_ALGORITHM_H */

@@ -3,21 +3,28 @@
 
 #include <vector>
 
-#include "tcs/data/map_object.h"
+#include "tcs/data/path.h"
+#include "tcs/data/point.h"
 
 namespace tcs {
 
 struct Step {
-  std::size_t index_;
-  MapObjectID source_;
-  MapObjectID destination_;
-  // MapObjectID path_;
+  std::size_t index;
+  Point* source;
+  Point* destination;
+  Path* path;
+  // MapObjectID source;
+  // MapObjectID destination;
+  // MapObjectID path;
 };
 
 class Route {
  public:
   Route() = default;
   Route(std::vector<Step> steps, double cost) : steps_(steps), cost_(cost) {}
+
+  std::vector<Step>& get_steps() { return steps_; }
+  double get_cost() { return cost_; }
 
  private:
   std::vector<Step> steps_;

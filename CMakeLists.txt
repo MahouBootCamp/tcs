@@ -12,6 +12,7 @@ add_subdirectory(googletest)
 add_executable(tcs_unit_test
     src/map_builder_test.cc
     src/order_pool_test.cc
+    src/router_test.cc
 )
 target_link_libraries(tcs_unit_test 
     PUBLIC libtcs
