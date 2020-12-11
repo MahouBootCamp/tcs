@@ -81,8 +81,10 @@ TEST_F(RouterTest, AlgorithmTest) {
 }
 
 TEST_F(RouterTest, PointToPoint) {
-  auto order = order_pool_->AddOrder({{17, "Load"}, {18, "Unload"}});
-  ASSERT_TRUE(router_->ChechRoutability(order_pool_->get_order(order)));
+  auto order0 = order_pool_->AddOrder({{17, "Load"}, {18, "Unload"}});
+  ASSERT_TRUE(router_->ChechRoutability(order_pool_->get_order(order0)));
+  auto order1 = order_pool_->AddOrder({{0, "Load"}, {6, "Unload"}});
+  ASSERT_FALSE(router_->ChechRoutability(order_pool_->get_order(order1)));
 }
 
 TEST_F(RouterTest, LocationToLocation) {
@@ -105,4 +107,10 @@ TEST_F(RouterTest, TransportOrder) {
   ASSERT_TRUE(route.has_value());
 }
 
-// TODO: More test on unroutable condition
+TEST_F(RouterTest, TransportOrderNoRoute) {
+  auto pvm = map_->get_point(6);
+  auto order0 = order_pool_->AddOrder(
+      {{22, "Load"}, {23, "Unload"}, {19, "Load"}, {20, "Unload"}});
+  auto route = router_->GetRoute(pvm, order_pool_->get_order(order0));
+  ASSERT_FALSE(route.has_value());
+}
