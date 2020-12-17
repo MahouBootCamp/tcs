@@ -1,4 +1,4 @@
-#include "tcs/kernal.h"
+#include "sim_vehicle_adapter_test.h"
 
 int main(int, char**) {
   // Read/Initialize model
@@ -10,9 +10,6 @@ int main(int, char**) {
 
   // TODO: Tighten const check on whole project
 
-  std::unique_ptr<tcs::IKernal> kernal{new tcs::Kernal{}};
-  kernal->Start();
-  std::this_thread::sleep_for(std::chrono::seconds(2));
-  kernal->Exit();
+  SimVehicleAdapterTest();
   return 0;
 }

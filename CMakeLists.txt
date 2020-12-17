@@ -24,7 +24,10 @@ target_include_directories(tcs_unit_test
     PUBLIC ${PROJECT_SOURCE_DIR}/include
 )
 
-add_executable(tcs_test main.cc)
+add_executable(tcs_test 
+    main.cc
+    src/sim_vehicle_adapter_test.cc
+)
 target_link_libraries(tcs_test 
     PUBLIC libtcs
 )

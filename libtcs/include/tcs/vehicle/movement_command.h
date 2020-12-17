@@ -7,10 +7,10 @@
 namespace tcs {
 
 struct MovementCommand {
-  Route& route;
-  Step& step;
+  // Route& route;
+  Step step;
   std::string operation;
-  Location* operation_location;
+  // Location* operation_location;
   bool is_last_movement;
 };
 

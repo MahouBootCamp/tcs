@@ -12,7 +12,7 @@ class IKernal {
   virtual KernalState get_state() = 0;
   virtual void Start() = 0;
   virtual void Exit() = 0;
-  virtual void SetVehicleController() = 0;
+  virtual void EnableVehicle() = 0;
   virtual TransportOrderID AddTransportOrder(
       std::vector<Destination> destinations,
       std::unordered_set<TransportOrderID> dependencies = {}) = 0;

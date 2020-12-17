@@ -10,12 +10,14 @@ include(CTest)
 enable_testing()
 
 add_library(libtcs 
+    src/default_controller.cc
     src/default_router.cc
     src/kernal.cc
     src/map_builder.cc
     src/map.cc
     src/order_pool.cc
     src/shortest_path_algorithm.cc
+    src/sim_vehicle_adapter.cc
 )
 
 target_include_directories(libtcs

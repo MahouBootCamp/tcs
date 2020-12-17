@@ -22,7 +22,7 @@ void Kernal::Exit() {
   on_quit_.set_value();
 }
 
-void Kernal::SetVehicleController() {}
+void Kernal::EnableVehicle() {}
 
 TransportOrderID Kernal::AddTransportOrder(
     std::vector<Destination> destinations,

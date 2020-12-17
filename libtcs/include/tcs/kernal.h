@@ -30,7 +30,7 @@ class Kernal : public IKernal {
 
   void Exit() override;
 
-  void SetVehicleController() override;
+  void EnableVehicle() override;
 
   TransportOrderID AddTransportOrder(
       std::vector<Destination> destinations,
