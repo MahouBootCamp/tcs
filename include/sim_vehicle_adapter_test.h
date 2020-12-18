@@ -1,8 +1,8 @@
 #ifndef SIM_VEHICLE_ADAPTER_TEST_H
 #define SIM_VEHICLE_ADAPTER_TEST_H
 
-#include "tcs/vehicle/sim_vehicle_adapter.h"
 #include "tcs/util/map_builder.h"
+#include "tcs/vehicle/sim_vehicle_adapter.h"
 
 tcs::Map* ProductVehicleAdapterTestMap() {
   auto builder = tcs::MapBuilder::GetInstance();
@@ -38,16 +38,17 @@ tcs::Map* ProductVehicleAdapterTestMap() {
   return builder.Build();
 }
 
-void SimVehicleAdapterTest(){
+void SimVehicleAdapterTest() {
   std::unique_ptr<tcs::Map> map_{ProductVehicleAdapterTestMap()};
   tcs::SimVehicleAdapter adapter;
 
   tcs::Step step0{0, map_->get_point(0), map_->get_point(1), map_->get_path(7)};
-  tcs::Step step1{1, map_->get_point(1), map_->get_point(2), map_->get_path(10)};
+  tcs::Step step1{1, map_->get_point(1), map_->get_point(2),
+                  map_->get_path(10)};
 
   adapter.Enable();
-  adapter.EnqueueCommand({step0, "Load", map_->get_location(22), false});
-  adapter.EnqueueCommand({step1, "Unload", map_->get_location(18), true});
+  adapter.EnqueueCommand({step0, "Load", false});
+  adapter.EnqueueCommand({step1, "Unload", true});
   std::this_thread::sleep_for(std::chrono::seconds(5));
   adapter.Disable();
 }

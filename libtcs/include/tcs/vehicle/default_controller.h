@@ -3,6 +3,7 @@
 
 #include <boost/log/trivial.hpp>
 #include <functional>
+#include <list>
 #include <memory>
 #include <optional>
 
@@ -13,69 +14,69 @@
 
 namespace tcs {
 
-// Undone: No multiprocess protection added
+// UNDONE: No multiprocess protection added
 class DefaultController : public IVehicleController {
  public:
   DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
-                    IScheduler* scheduler)
-      : vehicle_{vehicle}, adapter_{adapter}, scheduler_{scheduler} {
-    adapter_->FinishCommandEvent().Subscribe(std::bind(
-        &DefaultController::OnFinishCommandEvent, this, std::placeholders::_1));
-    adapter_->UpdatePositionEvent().Subscribe(
-        std::bind(&DefaultController::OnUpdatePositionEvent, this,
-                  std::placeholders::_1));
-    adapter_->RequestChargeEvent().Subscribe(
-        std::bind(&DefaultController::OnRequestChargeEvent, this));
+                    IScheduler* scheduler);
 
-    adapter_->Enable();
-  }
+  void OnUpdatePositionEvent(MapObjectID point);
 
-  void OnUpdatePositionEvent(MapObjectID point) {
-    vehicle_->set_current_point(point);
-  }
+  void OnFinishCommandEvent(MovementCommand cmd);
 
-  void OnFinishCommandEvent(MovementCommand cmd) {
-    if (cmd.operation == kChargeOperation) {
-      vehicle_->set_finish_charge(true);
-      vehicle_->set_need_charge(false);
-    }
-  }
+  void OnRequestChargeEvent();
 
-  void OnRequestChargeEvent() { vehicle_->set_need_charge(true); }
+  bool OnAllocationSuccessful(
+      std::unordered_set<MapResource*> resources) override;
 
-  bool OnAllocationSuccessful() override { return true; }
-
-  void OnAllocationFailed() override {}
+  void OnAllocationFailed() override;
 
   void SetDriveOrder(DriveOrder order) override;
 
-  void UpdateDriveOrder(DriveOrder order) override {}
+  // Only called in reroute. I'm not implementing reroute so I'm not
+  // implementing this.
+  void UpdateDriveOrder(DriveOrder order) override {
+    // NOT IMPLEMENTED
+    return;
+  }
 
-  void ClearDriveOrder() override {}
+  // Called when user aborts an order immediately.
+  // void ClearDriveOrder() override;
 
-  void AbortDriveOrder() override {}
+  // Called when user aborts an order.
+  void AbortDriveOrder(bool immediately) override;
 
-  void ClearCommandQueue() override {}
+  // Called when user aborts an order immediately.
+  // void ClearCommandQueue() override {}
 
   bool CanProcess(std::unordered_set<std::string> operations) override {
     return adapter_->CanProcess(operations);
   }
 
-  void InitPosition(MapObjectID point) override {
-    // adapter_->InitPosition(point);
-  }
+  // User sets initial position for vehicle.
+  // Would allocate a point resource for it immediately
+  void InitPosition(MapResource* point) override;
 
  private:
   std::vector<std::unordered_set<MapResource*>> ExpandDriveOrder(
       DriveOrder& order);
-  
+
   void CreateFutureCommands(DriveOrder& order);
+
+  void AllocateForNextCommand();
+
+  std::unordered_set<MapResource*> ExpandMovementCommand(MovementCommand& cmd);
 
   Vehicle* vehicle_;
   std::unique_ptr<IVehicleAdapter> adapter_;
   IScheduler* scheduler_;
   std::optional<DriveOrder> current_drive_order_ = std::nullopt;
-  std::vector<MovementCommand> command_vector_;
+  std::list<MovementCommand> command_queue_;
+  std::optional<MovementCommand> pending_command_;
+  std::unordered_set<MapResource*> pending_resources_;
+  bool waiting_for_allocation_ = false;
+  std::list<std::unordered_set<MapResource*>> allocated_resources_;
+  mutable std::mutex mut_;
 };
 
 }  // namespace tcs

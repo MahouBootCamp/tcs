@@ -12,7 +12,7 @@ namespace tcs {
 
 class DefaultRouter : public IRouter {
  public:
-  // Review: Use map service instead of map pointer?
+  // REVIEW: Use map service instead of map pointer?
   DefaultRouter(Map *map);
   bool ChechRoutability(TransportOrder *order) override;
   std::optional<std::vector<DriveOrder>> GetRoute(Point *start_point,
@@ -29,7 +29,7 @@ class DefaultRouter : public IRouter {
   std::unordered_set<Point *> GetTargetedPoints() override;
 
  private:
-  // Review: Move this function into map service?
+  // REVIEW: Move this function into map service?
   std::unordered_set<Point *> ExpandDestination(DriveOrder &drive_order);
 
   bool CheckRoutability(std::vector<DriveOrder> &drive_orders,
@@ -48,7 +48,7 @@ class DefaultRouter : public IRouter {
 
   // Protect cached routes
   mutable std::mutex mut_;
-  // Review: Get rid of direct access of map after initialization?
+  // REVIEW: Get rid of direct access of map after initialization?
   Map *map_;
   std::unordered_map<Vehicle *, std::vector<DriveOrder>> selected_routes_;
   ShortestPathAlgorithm algo_;

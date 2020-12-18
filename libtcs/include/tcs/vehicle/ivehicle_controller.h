@@ -14,16 +14,16 @@ namespace tcs {
 class IVehicleController {
  public:
   // Called by scheduler
-  virtual bool OnAllocationSuccessful() = 0;
+  virtual bool OnAllocationSuccessful(std::unordered_set<MapResource*> resources) = 0;
   // Called by scheduler
   virtual void OnAllocationFailed() = 0;
   virtual void SetDriveOrder(DriveOrder order) = 0;
   virtual void UpdateDriveOrder(DriveOrder order) = 0;
-  virtual void ClearDriveOrder() = 0;
-  virtual void AbortDriveOrder() = 0;
-  virtual void ClearCommandQueue() = 0;
+  // virtual void ClearDriveOrder() = 0;
+  virtual void AbortDriveOrder(bool immediately) = 0;
+  // virtual void ClearCommandQueue() = 0;
   virtual bool CanProcess(std::unordered_set<std::string> operations) = 0;
-  virtual void InitPosition(MapObjectID point) = 0;
+  virtual void InitPosition(MapResource* point) = 0;
   // TODO: Add a get movement command queue function
 
   // virtual void OnUpdatePositionEvent() = 0;
