@@ -4,15 +4,19 @@
 #include <memory>
 #include <unordered_map>
 
+#include "tcs/scheduler/ischeduler.h"
 #include "tcs/util/map.h"
+#include "tcs/vehicle/default_controller.h"
 #include "tcs/vehicle/ivehicle_controller.h"
+#include "tcs/vehicle/sim_vehicle_adapter.h"
 
 namespace tcs {
 
 // Controller Pool stores a map of vehicles to controllers
 class ControllerPool {
  public:
-  ControllerPool(Map* map) : map_{map} {}
+  ControllerPool(Map* map, IScheduler* scheduler)
+      : map_{map}, scheduler_{scheduler} {}
 
   // Controller would take the management of adapter's lifecycle.
   // If adapter is null, system would generate a simulate adapter.
@@ -27,6 +31,7 @@ class ControllerPool {
 
  private:
   Map* map_;
+  IScheduler* scheduler_;
   std::unordered_map<MapObjectID, std::unique_ptr<IVehicleController>>
       controller_pool_;
 };

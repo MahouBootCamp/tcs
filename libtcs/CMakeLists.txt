@@ -10,6 +10,7 @@ include(CTest)
 enable_testing()
 
 add_library(libtcs 
+    src/controller_pool.cc
     src/default_controller.cc
     src/default_router.cc
     src/kernal.cc
