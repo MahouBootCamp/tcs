@@ -18,7 +18,7 @@ enum class DriveOrderState {
 
 class DriveOrder {
  public:
-  DriveOrder(Destination destination) : destination_(destination) {}
+  DriveOrder(Destination destination) : destination_{destination} {}
 
   Destination get_destination() { return destination_; }
 

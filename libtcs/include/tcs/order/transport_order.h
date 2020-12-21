@@ -30,7 +30,7 @@ class TransportOrder {
 
   TransportOrder(TransportOrderID id, std::vector<Destination> destinations,
                  std::unordered_set<TransportOrderID> dependencies)
-      : id_(id), dependencies_(dependencies) {
+      : id_{id}, dependencies_{dependencies} {
     for (auto&& dst : destinations) {
       drive_orders_.push_back(dst);
     }

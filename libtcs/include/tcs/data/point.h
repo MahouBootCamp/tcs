@@ -24,9 +24,9 @@ enum class PointType {
 class Point : public MapResource {
  public:
   Point(MapObjectID id, Coordinate coordinate, PointType type)
-      : MapResource(id, MapObjectType::kPoint),
-        coordinate_(coordinate),
-        point_type_(type) {}
+      : MapResource{id, MapObjectType::kPoint},
+        coordinate_{coordinate},
+        point_type_{type} {}
 
   Coordinate get_coordinate() { return coordinate_; }
   void set_coordinate(Coordinate coordinate) { coordinate_ = coordinate; }

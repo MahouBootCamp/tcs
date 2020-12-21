@@ -21,7 +21,7 @@ struct Step {
 class Route {
  public:
   Route() = default;
-  Route(std::vector<Step> steps, double cost) : steps_(steps), cost_(cost) {}
+  Route(std::vector<Step> steps, double cost) : steps_{steps}, cost_{cost} {}
 
   std::vector<Step>& get_steps() { return steps_; }
   double get_cost() { return cost_; }

@@ -2,7 +2,7 @@
 
 namespace tcs {
 
-DefaultRouter::DefaultRouter(Map *map) : map_(map), algo_(map) {}
+DefaultRouter::DefaultRouter(Map *map) : map_{map}, algo_{map} {}
 
 bool DefaultRouter::ChechRoutability(TransportOrder *order) {
   auto future_orders = order->GetFutureDriveOrders();

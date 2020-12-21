@@ -12,10 +12,10 @@ class Path : public MapResource {
  public:
   Path(MapObjectID id, MapObjectID source, MapObjectID destination,
        double length)
-      : MapResource(id, MapObjectType::kPath),
-        source_(source),
-        destination_(destination),
-        length_(length) {}
+      : MapResource{id, MapObjectType::kPath},
+        source_{source},
+        destination_{destination},
+        length_{length} {}
 
   MapObjectID get_source() { return source_; }
   MapObjectID get_destination() { return destination_; }

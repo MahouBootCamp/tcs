@@ -27,7 +27,7 @@ enum class ProcessState { kIdle, kAwaitingOrder, kProcessingOrder };
 class Vehicle : public MapObject {
   // REVIEW: Should vehicle be a map object?
  public:
-  Vehicle(MapObjectID id) : MapObject(id, MapObjectType::kVehicle) {}
+  Vehicle(MapObjectID id) : MapObject{id, MapObjectType::kVehicle} {}
 
   bool get_need_charge() { return need_charge_; }
   void set_need_charge(bool need_charge) { need_charge_ = need_charge; }

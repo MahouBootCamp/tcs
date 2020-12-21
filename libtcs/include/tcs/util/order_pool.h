@@ -13,11 +13,12 @@ namespace tcs {
 
 class OrderPool {
  public:
-  // TODO: DELETE after finishing dev
+  // Default constructor only for test.
+  // TODO: DELETE it after finishing dev!
   OrderPool() = default;
 
   // Map* MUST NOT be nullptr
-  OrderPool(Map* map) : map_(map) {}
+  OrderPool(Map* map) : map_{map} {}
 
   TransportOrder* get_order(TransportOrderID);
   TransportOrderID AddOrder(

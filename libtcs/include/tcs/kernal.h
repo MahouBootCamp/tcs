@@ -22,7 +22,7 @@ const std::size_t kExecutorThreads = 1;
 
 class Kernal : public IKernal {
  public:
-  Kernal() : executor_(kExecutorThreads) {}
+  Kernal() : executor_{kExecutorThreads} {}
   ~Kernal();
 
   KernalState get_state() override { return state_; }

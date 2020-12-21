@@ -11,7 +11,7 @@ namespace tcs {
 // A MapResource can only be assigned to one vehicle at the same time.
 class MapResource : public MapObject {
  public:
-  MapResource(MapObjectID id, MapObjectType type) : MapObject(id, type) {}
+  MapResource(MapObjectID id, MapObjectType type) : MapObject{id, type} {}
   const std::unordered_set<MapObjectID>& get_blocks() const { return blocks_; }
   void AddBlock(MapObjectID block) { blocks_.insert(block); }
   void RemoveBlock(MapObjectID block) { blocks_.erase(block); }

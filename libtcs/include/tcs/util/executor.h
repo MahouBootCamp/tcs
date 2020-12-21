@@ -29,7 +29,7 @@ class Executor {
 };
 
 // the constructor just launches some amount of workers
-inline Executor::Executor(size_t threads) : stop_(false) {
+inline Executor::Executor(size_t threads) : stop_{false} {
   for (size_t i = 0; i < threads; ++i)
     workers_.emplace_back([this] {
       for (;;) {

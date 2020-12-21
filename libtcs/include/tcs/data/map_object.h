@@ -12,7 +12,7 @@ enum class MapObjectType { kPoint, kPath, kLocation, kBlock, kVehicle };
 // Base class for all map objects
 class MapObject {
  public:
-  MapObject(MapObjectID id, MapObjectType type) : id_(id), type_(type) {}
+  MapObject(MapObjectID id, MapObjectType type) : id_{id}, type_{type} {}
   MapObjectID get_id() const { return id_; }
   MapObjectType get_type() const { return type_; }
 

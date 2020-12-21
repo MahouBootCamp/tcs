@@ -16,9 +16,9 @@ class Location : public MapResource {
  public:
   Location(MapObjectID id, std::unordered_set<std::string> operations,
            std::unordered_set<MapObjectID> linked_points)
-      : MapResource(id, MapObjectType::kLocation),
-        operations_(operations),
-        linked_points_(linked_points) {}
+      : MapResource{id, MapObjectType::kLocation},
+        operations_{operations},
+        linked_points_{linked_points} {}
 
   void AddOperation(std::string operation) { operations_.insert(operation); }
   void RemoveOperation(std::string operation) { operations_.erase(operation); }
