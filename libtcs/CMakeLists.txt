@@ -13,10 +13,12 @@ add_library(libtcs
     src/controller_pool.cc
     src/default_controller.cc
     src/default_router.cc
+    src/default_scheduler.cc
     src/kernal.cc
     src/map_builder.cc
     src/map.cc
     src/order_pool.cc
+    src/reservation_pool.cc
     src/shortest_path_algorithm.cc
     src/sim_vehicle_adapter.cc
 )

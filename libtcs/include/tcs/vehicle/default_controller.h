@@ -14,11 +14,13 @@
 
 namespace tcs {
 
-// UNDONE: No multiprocess protection added
+// TODO: Add multithread protection
 class DefaultController : public IVehicleController {
  public:
   DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
                     IScheduler* scheduler);
+
+  MapObjectID GetVehicleID() override { return vehicle_->get_id(); }
 
   void OnUpdatePositionEvent(MapObjectID point);
 

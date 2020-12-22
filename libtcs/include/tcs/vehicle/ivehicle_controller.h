@@ -13,6 +13,7 @@ namespace tcs {
 // Vehicle controller provides interfaces for controlling vehicles
 class IVehicleController {
  public:
+  virtual MapObjectID GetVehicleID() = 0;
   // Called by scheduler
   virtual bool OnAllocationSuccessful(std::unordered_set<MapResource*> resources) = 0;
   // Called by scheduler

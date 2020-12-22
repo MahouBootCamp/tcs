@@ -11,6 +11,8 @@ namespace tcs {
 
 class IScheduler {
  public:
+  // NOTE: The first three functions are meaningless tbh.
+
   // Claim a sequence of resources for a vehicle
   virtual void Claim(
       IVehicleController* vehicle,
@@ -21,6 +23,7 @@ class IScheduler {
   // index are no longer needed.
   virtual void UpdateProgressIndex(IVehicleController* vehicle,
                                    std::size_t index) = 0;
+
   // Allocate resources for vehicle. A MapResource can only be reserved for one
   // vehicle at the same time.
   virtual void Allocate(IVehicleController* vehicle,
