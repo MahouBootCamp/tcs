@@ -30,6 +30,8 @@ class ReservationPool {
   void Free(IVehicleController* vehicle,
             std::unordered_set<MapResource*>& resources);
   void FreeAll(IVehicleController* vehicle);
+  std::unordered_set<MapResource*> FilterCompletelyFreeResources(
+      std::unordered_set<MapResource*>& resources);
 
  private:
   std::unordered_set<MapResource*> GetFreeableResources(

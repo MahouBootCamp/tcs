@@ -35,11 +35,11 @@ class Point : public MapResource {
 
   void AddInPath(MapObjectID path_id) { in_paths_.insert(path_id); }
   void RemoveInPath(MapObjectID path_id) { in_paths_.erase(path_id); }
-  const std::unordered_set<MapObjectID>& get_in_paths() { return in_paths_; }
+  std::unordered_set<MapObjectID>& get_in_paths() { return in_paths_; }
 
   void AddOutPath(MapObjectID path_id) { out_paths_.insert(path_id); }
   void RemoveOutPath(MapObjectID path_id) { out_paths_.erase(path_id); }
-  const std::unordered_set<MapObjectID>& get_out_paths() { return out_paths_; }
+  std::unordered_set<MapObjectID>& get_out_paths() { return out_paths_; }
 
   MapObjectRef get_linked_location() { return linked_location_; }
   void set_linked_location(MapObjectRef location_ref) {

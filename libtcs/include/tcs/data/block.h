@@ -18,7 +18,7 @@ class Block : public MapObject {
   void RemoveResource(MapObjectID resource_id) {
     resources_.erase(resource_id);
   }
-  const std::unordered_set<MapObjectID>& get_resources() { return resources_; }
+  std::unordered_set<MapObjectID>& get_resources() { return resources_; }
 
  private:
   std::unordered_set<MapObjectID> resources_;

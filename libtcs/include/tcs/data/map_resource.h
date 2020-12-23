@@ -12,7 +12,7 @@ namespace tcs {
 class MapResource : public MapObject {
  public:
   MapResource(MapObjectID id, MapObjectType type) : MapObject{id, type} {}
-  const std::unordered_set<MapObjectID>& get_blocks() const { return blocks_; }
+  std::unordered_set<MapObjectID>& get_blocks() { return blocks_; }
   void AddBlock(MapObjectID block) { blocks_.insert(block); }
   void RemoveBlock(MapObjectID block) { blocks_.erase(block); }
 

@@ -53,6 +53,17 @@ void ReservationPool::FreeAll(IVehicleController *vehicle) {
   }
 }
 
+std::unordered_set<MapResource *>
+ReservationPool::FilterCompletelyFreeResources(
+    std::unordered_set<MapResource *> &resources) {
+  std::unordered_set<MapResource *> res;
+  for (auto &resource : resources) {
+    auto &entry = GetReservationEntry(resource);
+    if (entry.vehicle == nullptr && entry.count == 0) res.insert(resource);
+  }
+  return res;
+}
+
 std::unordered_set<MapResource *> ReservationPool::GetFreeableResources(
     IVehicleController *vehicle, std::unordered_set<MapResource *> &resources) {
   std::unordered_set<MapResource *> res;

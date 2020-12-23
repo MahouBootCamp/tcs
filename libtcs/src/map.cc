@@ -40,6 +40,16 @@ Vehicle* Map::get_vehicle(MapObjectID id) {
              : static_cast<Vehicle*>(object_pool_[id].get());
 }
 
+std::unordered_set<MapResource*> Map::GetResources(
+    std::unordered_set<MapObjectID>& id_set) {
+  std::unordered_set<MapResource*> resources;
+  for (auto& id : id_set) {
+    auto resource = get_resource(id);
+    if (resource) resources.insert(resource);
+  }
+  return resources;
+}
+
 std::unordered_set<MapResource*> Map::GetAllResources() {
   std::unordered_set<MapResource*> res;
   for (auto& id : point_ids_)
