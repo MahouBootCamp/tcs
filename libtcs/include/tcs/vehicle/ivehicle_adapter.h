@@ -3,6 +3,7 @@
 
 #include <unordered_set>
 
+#include "tcs/data/vehicle.h"
 #include "tcs/util/event.h"
 #include "tcs/vehicle/movement_command.h"
 
@@ -23,12 +24,18 @@ class IVehicleAdapter {
 
   Event<MapObjectID>& UpdatePositionEvent() { return update_position_event_; }
   Event<MovementCommand>& FinishCommandEvent() { return finish_command_event_; }
+  Event<MovementCommand>& FailCommandEvent() { return fail_command_event_; }
   Event<>& RequestChargeEvent() { return request_charge_event_; }
+  Event<VehicleState>& UpdateVehicleStateEvent() {
+    return update_vehicle_state_event_;
+  }
 
  private:
   Event<MapObjectID> update_position_event_;
   Event<MovementCommand> finish_command_event_;
+  Event<MovementCommand> fail_command_event_;
   Event<> request_charge_event_;
+  Event<VehicleState> update_vehicle_state_event_;
 };
 
 }  // namespace tcs

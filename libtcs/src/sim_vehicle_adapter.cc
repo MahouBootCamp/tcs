@@ -10,6 +10,7 @@ SimVehicleAdapter::~SimVehicleAdapter() {
 void SimVehicleAdapter::Enable() {
   BOOST_LOG_TRIVIAL(debug) << "Enable SimVehicleAdapter";
   enabled_ = true;
+  UpdateVehicleStateEvent().Fire(VehicleState::kIdle);
   BOOST_LOG_TRIVIAL(debug) << "Simulation thread initializing";
   simulate_thread_ = std::thread(&SimVehicleAdapter::SimulateTasks, this);
 }
@@ -17,6 +18,7 @@ void SimVehicleAdapter::Enable() {
 void SimVehicleAdapter::Disable() {
   BOOST_LOG_TRIVIAL(debug) << "Disable SimVehicleAdapter";
   enabled_ = false;
+  UpdateVehicleStateEvent().Fire(VehicleState::kUnknown);
 }
 
 bool SimVehicleAdapter::CanProcess(std::unordered_set<std::string> operations) {
@@ -55,36 +57,44 @@ void SimVehicleAdapter::SimulateTasks() {
     }
 
     if (has_cmd) {
-      // Sim move
-      BOOST_LOG_TRIVIAL(debug)
-          << "Simulating movement from " << cmd.step.source->get_id()
-          << " towards " << cmd.step.destination->get_id();
-      // double time_cost = cmd.step.path->get_length() / kSimSpeed * 1000;
-      // std::this_thread::sleep_for(
-      //     std::chrono::milliseconds(long(round(time_cost))));
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-      UpdatePositionEvent().Fire(cmd.step.destination->get_id());
+      try {
+        // Sim move
+        BOOST_LOG_TRIVIAL(debug)
+            << "Simulating movement from " << cmd.step.source->get_id()
+            << " towards " << cmd.step.destination->get_id();
+        // double time_cost = cmd.step.path->get_length() / kSimSpeed * 1000;
+        // std::this_thread::sleep_for(
+        //     std::chrono::milliseconds(long(round(time_cost))));
+        UpdateVehicleStateEvent().Fire(VehicleState::kExecuting);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        UpdatePositionEvent().Fire(cmd.step.destination->get_id());
 
-      // Sim operation
-      BOOST_LOG_TRIVIAL(debug) << "Simulating operation: " << cmd.operation;
-      if (cmd.operation != kNoOperation) {
-        if (cmd.operation == kChargeOperation) {
-          cnt_ = 0;
-          std::this_thread::sleep_for(
-              std::chrono::seconds(kSimChargeOperation));
-        } else {
-          std::this_thread::sleep_for(std::chrono::seconds(kSimOperation));
-          cnt_ += 1;
-        }
+        // Sim operation
+        BOOST_LOG_TRIVIAL(debug) << "Simulating operation: " << cmd.operation;
+        if (cmd.operation != kNoOperation) {
+          if (cmd.operation == kChargeOperation) {
+            UpdateVehicleStateEvent().Fire(VehicleState::kCharging);
+            cnt_ = 0;
+            std::this_thread::sleep_for(
+                std::chrono::seconds(kSimChargeOperation));
+          } else {
+            std::this_thread::sleep_for(std::chrono::seconds(kSimOperation));
+            cnt_ += 1;
+          }
 
-        {
-          std::scoped_lock<std::mutex> lk{mut_};
-          if (cmd.operation == kLoadOperation) loaded_ = true;
-          if (cmd.operation == kUnloadOperation) loaded_ = false;
+          {
+            std::scoped_lock<std::mutex> lk{mut_};
+            if (cmd.operation == kLoadOperation) loaded_ = true;
+            if (cmd.operation == kUnloadOperation) loaded_ = false;
+          }
         }
+        if (cnt_ >= 20) RequestChargeEvent().Fire();
+        UpdateVehicleStateEvent().Fire(VehicleState::kIdle);
+        FinishCommandEvent().Fire(std::move(cmd));
+      } catch (std::exception e) {
+        BOOST_LOG_TRIVIAL(error) << e.what();
+        FailCommandEvent().Fire(std::move(cmd));
       }
-      if (cnt_ >= 20) RequestChargeEvent().Fire();
-      FinishCommandEvent().Fire(std::move(cmd));
     }
   }
 }

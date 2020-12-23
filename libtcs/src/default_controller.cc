@@ -7,10 +7,15 @@ DefaultController::DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
     : vehicle_{vehicle}, adapter_{adapter}, scheduler_{scheduler} {
   adapter_->FinishCommandEvent().Subscribe(std::bind(
       &DefaultController::OnFinishCommandEvent, this, std::placeholders::_1));
+  adapter_->FailCommandEvent().Subscribe(std::bind(
+      &DefaultController::OnFailCommandEvent, this, std::placeholders::_1));
   adapter_->UpdatePositionEvent().Subscribe(std::bind(
       &DefaultController::OnUpdatePositionEvent, this, std::placeholders::_1));
   adapter_->RequestChargeEvent().Subscribe(
       std::bind(&DefaultController::OnRequestChargeEvent, this));
+  adapter_->UpdateVehicleStateEvent().Subscribe(
+      std::bind(&DefaultController::OnUpdateVehicleStateEvent, this,
+                std::placeholders::_1));
 
   adapter_->Enable();
 }
@@ -24,10 +29,32 @@ void DefaultController::OnFinishCommandEvent(MovementCommand cmd) {
     vehicle_->set_finish_charge(true);
     vehicle_->set_need_charge(false);
   }
+  auto resources = std::move(allocated_resources_.front());
+  allocated_resources_.pop_front();
+  scheduler_->Free(this, resources);
+  // Check if current drive order is finished
+  if (!pending_command_.has_value() && command_queue_.empty() &&
+      !waiting_for_allocation_) {
+    vehicle_->set_route_progress_index(0);
+    vehicle_->set_process_state(
+        ProcessState::kAwaitingOrder);  // The dispatcher would notice this
+                                        // state change in next phase
+    current_drive_order_.reset();
+  } else if (!waiting_for_allocation_) {
+    AllocateForNextCommand();
+  }
+}
+
+void DefaultController::OnFailCommandEvent(MovementCommand cmd) {
+  // UNDONE: Not implemented
 }
 
 void DefaultController::OnRequestChargeEvent() {
   vehicle_->set_need_charge(true);
+}
+
+void DefaultController::OnUpdateVehicleStateEvent(VehicleState state) {
+  vehicle_->set_vehicle_state(state);
 }
 
 bool DefaultController::OnAllocationSuccessful(
@@ -110,7 +137,7 @@ DefaultController::ExpandDriveOrder(DriveOrder& order) {
 }
 
 void DefaultController::CreateFutureCommands(DriveOrder& order) {
-  // TODO: command_vector_.clear() ?
+  // TODO: command_queue_.clear() ?
 
   std::string operation = order.get_destination().operation;
   auto& steps = order.get_route()->get_steps();

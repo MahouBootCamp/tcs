@@ -26,7 +26,11 @@ class DefaultController : public IVehicleController {
 
   void OnFinishCommandEvent(MovementCommand cmd);
 
+  void OnFailCommandEvent(MovementCommand cmd);
+
   void OnRequestChargeEvent();
+
+  void OnUpdateVehicleStateEvent(VehicleState state);
 
   bool OnAllocationSuccessful(
       std::unordered_set<MapResource*> resources) override;
