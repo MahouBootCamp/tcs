@@ -13,7 +13,6 @@ template <class... Args>
 class Event {
  public:
   Event() = default;
-  // Event(std::function<void(Args...)> handler) : handler_{handler} {}
 
   std::size_t Subscribe(std::function<void(Args...)> handler) {
     std::scoped_lock<std::mutex> lk{mut_};

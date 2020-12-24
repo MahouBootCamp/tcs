@@ -64,7 +64,7 @@ void DefaultScheduler::AllocateTask(
 
 void DefaultScheduler::CheckTask(IVehicleController *vehicle,
                                  std::unordered_set<MapResource *> resources) {
-  if (!vehicle->OnAllocationSuccessful(resources)) {
+  if (!vehicle->AllocationSuccessful(resources)) {
     BOOST_LOG_TRIVIAL(warning)
         << "Resources are refused by vehicle " << vehicle->GetVehicleID()
         << ". Freeing them...";

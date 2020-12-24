@@ -15,9 +15,9 @@ class IVehicleController {
  public:
   virtual MapObjectID GetVehicleID() = 0;
   // Called by scheduler
-  virtual bool OnAllocationSuccessful(std::unordered_set<MapResource*> resources) = 0;
+  virtual bool AllocationSuccessful(std::unordered_set<MapResource*> resources) = 0;
   // Called by scheduler
-  virtual void OnAllocationFailed() = 0;
+  virtual void AllocationFailed() = 0;
   virtual void SetDriveOrder(DriveOrder order) = 0;
   virtual void UpdateDriveOrder(DriveOrder order) = 0;
   // virtual void ClearDriveOrder() = 0;

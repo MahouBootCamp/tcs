@@ -5,26 +5,29 @@ namespace tcs {
 DefaultController::DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
                                      IScheduler* scheduler)
     : vehicle_{vehicle}, adapter_{adapter}, scheduler_{scheduler} {
-  adapter_->FinishCommandEvent().Subscribe(std::bind(
-      &DefaultController::OnFinishCommandEvent, this, std::placeholders::_1));
-  adapter_->FailCommandEvent().Subscribe(std::bind(
-      &DefaultController::OnFailCommandEvent, this, std::placeholders::_1));
-  adapter_->UpdatePositionEvent().Subscribe(std::bind(
-      &DefaultController::OnUpdatePositionEvent, this, std::placeholders::_1));
+  adapter_->FinishCommandEvent().Subscribe(
+      std::bind(&DefaultController::FinishCommandEventHandler, this,
+                std::placeholders::_1));
+  adapter_->FailCommandEvent().Subscribe(
+      std::bind(&DefaultController::FailCommandEventHandler, this,
+                std::placeholders::_1));
+  adapter_->UpdatePositionEvent().Subscribe(
+      std::bind(&DefaultController::UpdatePositionEventHandler, this,
+                std::placeholders::_1));
   adapter_->RequestChargeEvent().Subscribe(
-      std::bind(&DefaultController::OnRequestChargeEvent, this));
+      std::bind(&DefaultController::RequestChargeEventHandler, this));
   adapter_->UpdateVehicleStateEvent().Subscribe(
-      std::bind(&DefaultController::OnUpdateVehicleStateEvent, this,
+      std::bind(&DefaultController::UpdateVehicleStateEventHandler, this,
                 std::placeholders::_1));
 
   adapter_->Enable();
 }
 
-void DefaultController::OnUpdatePositionEvent(MapObjectID point) {
+void DefaultController::UpdatePositionEventHandler(MapObjectID point) {
   vehicle_->set_current_point(point);
 }
 
-void DefaultController::OnFinishCommandEvent(MovementCommand cmd) {
+void DefaultController::FinishCommandEventHandler(MovementCommand cmd) {
   if (cmd.operation == kChargeOperation) {
     vehicle_->set_finish_charge(true);
     vehicle_->set_need_charge(false);
@@ -45,19 +48,19 @@ void DefaultController::OnFinishCommandEvent(MovementCommand cmd) {
   }
 }
 
-void DefaultController::OnFailCommandEvent(MovementCommand cmd) {
+void DefaultController::FailCommandEventHandler(MovementCommand cmd) {
   // UNDONE: Not implemented
 }
 
-void DefaultController::OnRequestChargeEvent() {
+void DefaultController::RequestChargeEventHandler() {
   vehicle_->set_need_charge(true);
 }
 
-void DefaultController::OnUpdateVehicleStateEvent(VehicleState state) {
+void DefaultController::UpdateVehicleStateEventHandler(VehicleState state) {
   vehicle_->set_vehicle_state(state);
 }
 
-bool DefaultController::OnAllocationSuccessful(
+bool DefaultController::AllocationSuccessful(
     std::unordered_set<MapResource*> resources) {
   if (pending_resources_ != resources) return false;
 
@@ -77,7 +80,7 @@ bool DefaultController::OnAllocationSuccessful(
   return true;
 }
 
-void DefaultController::OnAllocationFailed() {
+void DefaultController::AllocationFailed() {
   throw std::runtime_error("Allocation fails");
 }
 

@@ -22,20 +22,20 @@ class DefaultController : public IVehicleController {
 
   MapObjectID GetVehicleID() override { return vehicle_->get_id(); }
 
-  void OnUpdatePositionEvent(MapObjectID point);
+  void UpdatePositionEventHandler(MapObjectID point);
 
-  void OnFinishCommandEvent(MovementCommand cmd);
+  void FinishCommandEventHandler(MovementCommand cmd);
 
-  void OnFailCommandEvent(MovementCommand cmd);
+  void FailCommandEventHandler(MovementCommand cmd);
 
-  void OnRequestChargeEvent();
+  void RequestChargeEventHandler();
 
-  void OnUpdateVehicleStateEvent(VehicleState state);
+  void UpdateVehicleStateEventHandler(VehicleState state);
 
-  bool OnAllocationSuccessful(
+  bool AllocationSuccessful(
       std::unordered_set<MapResource*> resources) override;
 
-  void OnAllocationFailed() override;
+  void AllocationFailed() override;
 
   void SetDriveOrder(DriveOrder order) override;
 
