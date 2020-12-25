@@ -14,12 +14,13 @@ using TransportOrderRef = std::optional<TransportOrderID>;
 
 enum class TransportOrderState {
   kRaw,           // Just created
-  kActive,        // Creation completed, waiting to check dispachability
+  kActive,        // Routable and waiting for dependencies to finish
   kDispatchable,  // All dependencies completed, ready to dispatch
   kBeingProcessed,
   kWithdraw,
   kFinished,
-  kFailed
+  kFailed,
+  kUnRoutable
 };
 
 class TransportOrder {
@@ -40,19 +41,23 @@ class TransportOrder {
   std::vector<DriveOrder>& get_drive_orders() { return drive_orders_; }
 
   std::vector<DriveOrder> GetFutureDriveOrders() {
-    return std::vector<DriveOrder>(
-        drive_orders_.begin() + next_drive_order_index_, drive_orders_.end());
+    return std::vector<DriveOrder>(drive_orders_.begin() + progress_index_,
+                                   drive_orders_.end());
   }
 
   std::unordered_set<TransportOrderID>& get_dependencies() {
     return dependencies_;
   }
 
+  std::size_t get_progress_index() { return progress_index_; }
+
+  TransportOrderState get_state() { return state_; }
+
  private:
   TransportOrderID id_;
   std::vector<DriveOrder> drive_orders_;
   std::unordered_set<TransportOrderID> dependencies_;
-  std::size_t next_drive_order_index_ = 0;
+  std::size_t progress_index_ = 0;
   TransportOrderState state_ = TransportOrderState::kRaw;
   MapObjectRef vehicle_ = std::nullopt;
 };

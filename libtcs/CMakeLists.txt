@@ -12,6 +12,7 @@ enable_testing()
 add_library(libtcs 
     src/controller_pool.cc
     src/default_controller.cc
+    src/default_dispatcher.cc
     src/default_router.cc
     src/default_scheduler.cc
     src/kernal.cc
@@ -21,6 +22,7 @@ add_library(libtcs
     src/reservation_pool.cc
     src/shortest_path_algorithm.cc
     src/sim_vehicle_adapter.cc
+    src/transport_order_service.cc
 )
 
 target_include_directories(libtcs
