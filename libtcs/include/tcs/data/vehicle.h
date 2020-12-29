@@ -15,6 +15,7 @@ enum class VehicleState {
   kCharging
 };
 
+// NOTE: Now it can only be kIgnored or kUtilized
 enum class IntegrationLevel {
   kIgnored,    // System would take it as not exsisting.
   kNoticed,    // System knows its position, but would not reserve resources.

@@ -4,6 +4,7 @@
 #include <optional>
 #include <unordered_set>
 
+#include "tcs/data/location.h"
 #include "tcs/data/map_object.h"
 #include "tcs/order/drive_order.h"
 
@@ -35,6 +36,8 @@ class TransportOrder {
     for (auto&& dst : destinations) {
       drive_orders_.push_back(dst);
     }
+    // System created Parking order can be dispensed
+    if (destinations.back().operation == kParkOperation) dispensable_ = true;
   }
 
   TransportOrderID get_id() { return id_; }
@@ -53,6 +56,10 @@ class TransportOrder {
 
   TransportOrderState get_state() { return state_; }
 
+  MapObjectRef get_vehicle() { return vehicle_; }
+
+  bool get_dispensable() { return dispensable_; }
+
  private:
   TransportOrderID id_;
   std::vector<DriveOrder> drive_orders_;
@@ -60,6 +67,7 @@ class TransportOrder {
   std::size_t progress_index_ = 0;
   TransportOrderState state_ = TransportOrderState::kRaw;
   MapObjectRef vehicle_ = std::nullopt;
+  bool dispensable_ = false;
 };
 
 }  // namespace tcs

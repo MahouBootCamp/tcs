@@ -17,12 +17,22 @@ add_library(libtcs
     src/default_scheduler.cc
     src/kernal.cc
     src/map_builder.cc
+    src/map_service.cc
     src/map.cc
     src/order_pool.cc
+    src/phase0_check_new_order.cc
+    src/phase1_finish_withdrawal.cc
+    src/phase2_assign_next_drive_order.cc
+    src/phase3_assign_reserved_order.cc
+    src/phase4_assign_free_order.cc
+    src/phase5_recharge_vehicle.cc
+    src/phase6_park_vehicle.cc
     src/reservation_pool.cc
+    src/reserve_order_pool.cc
     src/shortest_path_algorithm.cc
     src/sim_vehicle_adapter.cc
     src/transport_order_service.cc
+    src/vehicle_service.cc
 )
 
 target_include_directories(libtcs

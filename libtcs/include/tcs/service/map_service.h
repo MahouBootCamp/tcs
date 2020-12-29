@@ -1,11 +1,23 @@
 #ifndef MAP_SERVICE_H
 #define MAP_SERVICE_H
 
+#include "tcs/data/vehicle.h"
+#include "tcs/util/map.h"
+
 namespace tcs {
 
-class MapUtil {
+class MapService {
  public:
+  MapService(Map* map) : map_{map} {}
+
+  std::unordered_set<Vehicle*> GetAllVehicles() {
+    return map_->GetAllVehicles();
+  }
+
+  Point* GetPoint(MapObjectID point_id) { return map_->get_point(point_id); }
+
  private:
+  Map* map_;
 };
 
 }  // namespace tcs

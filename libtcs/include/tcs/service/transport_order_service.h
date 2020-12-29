@@ -19,6 +19,9 @@ class TransportOrderService {
   TransportOrder* GetTransportOrder(TransportOrderID id);
   void SetTransportOrderNextDriveOrder(TransportOrderID id);
   void UpdateOrderWithDependencyFinished(TransportOrderID finished_id);
+  void SetTransportOrderVehicleAndDriveOrder(
+      TransportOrderID id, MapObjectRef vehicle_ref,
+      std::optional<std::vector<DriveOrder>> drive_orders);
 
  private:
   Event<TransportOrderState, TransportOrderState> order_state_change_event_;
