@@ -32,6 +32,7 @@ add_library(libtcs
     src/shortest_path_algorithm.cc
     src/sim_vehicle_adapter.cc
     src/transport_order_service.cc
+    src/universal_dispatch_util.cc
     src/vehicle_service.cc
 )
 

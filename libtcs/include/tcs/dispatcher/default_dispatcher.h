@@ -12,6 +12,7 @@
 #include "tcs/dispatcher/phase5_recharge_vehicle.h"
 #include "tcs/dispatcher/phase6_park_vehicle.h"
 #include "tcs/dispatcher/reserve_order_pool.h"
+#include "tcs/dispatcher/universal_dispatch_util.h"
 #include "tcs/router/irouter.h"
 #include "tcs/service/map_service.h"
 #include "tcs/service/transport_order_service.h"
@@ -46,7 +47,8 @@ class DefaultDispatcher : public IDispatcher {
   TransportOrderService* transport_order_service_;
   VehicleService* vehicle_service_;
   ControllerPool* controller_pool_;
-  ReserveOrderPool* reserve_order_pool_;
+  std::unique_ptr<ReserveOrderPool> reserve_order_pool_;
+  std::unique_ptr<UniversalDispatchUtil> universal_dispatch_util_;
 
   // TODO: Add constructors for all phases
   Phase0CheckNewOrder phase0_;
