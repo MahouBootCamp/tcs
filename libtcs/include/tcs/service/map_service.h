@@ -15,6 +15,7 @@ class MapService {
   }
 
   Point* GetPoint(MapObjectID point_id) { return map_->get_point(point_id); }
+  std::unordered_set<Point*> GetAllPoints() { return map_->GetAllPoints(); }
 
  private:
   Map* map_;

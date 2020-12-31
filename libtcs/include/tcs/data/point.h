@@ -15,9 +15,10 @@ struct Coordinate {
 };
 
 enum class PointType {
-  kHalt,   // Vehicles report and can halt for operation
-  kPark,   // Vehicles report and can park here if idle
-  kReport  // Vehicles must report upon arriving a Report Point
+  kHalt,    // Vehicles report and can halt for operation
+  kPark,    // Vehicles report and can park here if idle
+  kCharge,  // Vehicles report and can charge here if low power
+  kReport   // Vehicles must report upon arriving a Report Point
 };
 
 // Points are positions on map

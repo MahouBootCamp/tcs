@@ -5,9 +5,16 @@
 
 namespace tcs {
 
+// UNDONE: We need to review this part
+// NOTE: The phase would be skipped
 class Phase5RechargeVehicle : public Phase {
  public:
   void Run() override;
+ private:
+  void CreateRechargeOrder(Vehicle* vehicle);
+
+  VehicleService* vehicle_service_;
+  MapService* map_service_;
 };
 
 }  // namespace tcs
