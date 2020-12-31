@@ -1,8 +1,8 @@
-#include "tcs/dispatcher/phase6_park_vehicle.h"
+#include "tcs/dispatcher/phase5_charge_vehicle.h"
 
 namespace tcs {
 
-void Phase6ParkVehicle::Run() {
+void Phase5ChargeVehicle::Run() {
   return;
 
   BOOST_LOG_TRIVIAL(info) << "Phase 5: Charge low power vehicles...";
@@ -19,27 +19,27 @@ void Phase6ParkVehicle::Run() {
     return;
   }
 
-  auto park_location = map_service_->GetParkLocation();
+  auto charge_location = map_service_->GetChargeLocation();
   for (auto& vehicle : vehicles) {
     // Check if there are available charge points on each loop
-    if (park_location->get_linked_points().empty()) {
+    if (charge_location->get_linked_points().empty()) {
       BOOST_LOG_TRIVIAL(info) << "No available charge points, skipping...";
       return;
     }
-    CreateParkOrder(vehicle);
+    CreateChargeOrder(vehicle);
   }
 }
 
-void Phase6ParkVehicle::CreateParkOrder(Vehicle* vehicle) {
-  auto park_location = map_service_->GetParkLocation();
+void Phase5ChargeVehicle::CreateChargeOrder(Vehicle* vehicle) {
+  auto charge_location = map_service_->GetChargeLocation();
 
   auto order_id =
-      order_pool_->AddOrder({{park_location->get_id(), kParkOperation}});
+      order_pool_->AddOrder({{charge_location->get_id(), kChargeOperation}});
   auto order = order_pool_->get_order(order_id);
   auto drive_order = router_->GetRoute(
       map_service_->GetPoint(vehicle->get_current_point().value()), order);
   if (drive_order.has_value()) {
-    park_location->ReservePoint(drive_order->back()
+    charge_location->ReservePoint(drive_order->back()
                                       .get_route()
                                       ->get_steps()
                                       .back()
@@ -49,5 +49,4 @@ void Phase6ParkVehicle::CreateParkOrder(Vehicle* vehicle) {
   }
 }
 
-
-}
+}  // namespace tcs

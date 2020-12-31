@@ -32,9 +32,29 @@ class Location : public MapResource {
     return linked_points_;
   }
 
- private:
+ protected:
   std::unordered_set<std::string> operations_;
   std::unordered_set<MapObjectID> linked_points_;
+};
+
+class SpecialLocation : public Location {
+ public:
+  SpecialLocation(MapObjectID id, std::string operation,
+                  std::unordered_set<MapObjectID> linked_points)
+      : Location{id, {operation}, linked_points} {}
+
+  void ReservePoint(MapObjectID point_id) {
+    reserved_points_.insert(point_id);
+    linked_points_.erase(point_id);
+  }
+
+  void ReleasePoint(MapObjectID point_id) {
+    reserved_points_.erase(point_id);
+    linked_points_.insert(point_id);
+  }
+
+ private:
+  std::unordered_set<MapObjectID> reserved_points_;
 };
 
 }  // namespace tcs

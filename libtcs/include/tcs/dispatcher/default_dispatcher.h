@@ -9,7 +9,7 @@
 #include "tcs/dispatcher/phase2_assign_next_drive_order.h"
 #include "tcs/dispatcher/phase3_assign_reserved_order.h"
 #include "tcs/dispatcher/phase4_assign_free_order.h"
-#include "tcs/dispatcher/phase5_recharge_vehicle.h"
+#include "tcs/dispatcher/phase5_charge_vehicle.h"
 #include "tcs/dispatcher/phase6_park_vehicle.h"
 #include "tcs/dispatcher/reserve_order_pool.h"
 #include "tcs/dispatcher/universal_dispatch_util.h"
@@ -56,7 +56,7 @@ class DefaultDispatcher : public IDispatcher {
   Phase2AssignNextDriveOrder phase2_;
   Phase3AssignReservedOrder phase3_;
   Phase4AssignFreeOrder phase4_;
-  Phase5RechargeVehicle phase5_;
+  Phase5ChargeVehicle phase5_;
   Phase6ParkVehicle phase6_;
 };
 

@@ -2,7 +2,7 @@
 
 namespace tcs {
 
-void Phase2AssignNextDriveOrder::Run(){
+void Phase2AssignNextDriveOrder::Run() {
   BOOST_LOG_TRIVIAL(info) << "Phase 2: Assign Next Drive Order...";
   auto vehicles = vehicle_service_->FilterVehiclesByProcessState(
       ProcessState::kAwaitingOrder);
@@ -11,7 +11,7 @@ void Phase2AssignNextDriveOrder::Run(){
   }
 }
 
-void Phase2AssignNextDriveOrder::CheckForNextOrder(Vehicle* vehicle){
+void Phase2AssignNextDriveOrder::CheckForNextOrder(Vehicle* vehicle) {
   auto vehicle_id = vehicle->get_id();
   auto order_id = vehicle->get_transport_order().value();
   transport_order_service_->SetTransportOrderNextDriveOrder(order_id);
@@ -23,6 +23,29 @@ void Phase2AssignNextDriveOrder::CheckForNextOrder(Vehicle* vehicle){
     // Update order to kFinished
     transport_order_service_->UpdateOrderState(order_id,
                                                TransportOrderState::kFinished);
+
+    // If charge / park order, cancel reservation of charge point
+    if (order->get_drive_orders().back().get_destination().site ==
+        map_service_->GetChargeLocation()->get_id()) {
+      map_service_->GetChargeLocation()->ReleasePoint(
+          order->get_drive_orders()
+              .back()
+              .get_route()
+              ->get_steps()
+              .back()
+              .destination->get_id());
+    }
+
+    if (order->get_drive_orders().back().get_destination().site ==
+        map_service_->GetParkLocation()->get_id()) {
+      map_service_->GetParkLocation()->ReleasePoint(order->get_drive_orders()
+                                                        .back()
+                                                        .get_route()
+                                                        ->get_steps()
+                                                        .back()
+                                                        .destination->get_id());
+    }
+
     // Update vehicle to kIdle. It would be dispatched in next phase
     vehicle_service_->UpdateVehicleProcessState(vehicle_id,
                                                 ProcessState::kIdle);
@@ -53,4 +76,4 @@ void Phase2AssignNextDriveOrder::CheckForNextOrder(Vehicle* vehicle){
   }
 }
 
-}
+}  // namespace tcs

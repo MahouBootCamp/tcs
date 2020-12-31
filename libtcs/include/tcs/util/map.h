@@ -38,6 +38,9 @@ class Map {
   std::unordered_set<Block*> GetAllBlocks();
   std::unordered_set<Vehicle*> GetAllVehicles();
 
+  SpecialLocation* GetChargeLocation() { return charge_location_; }
+  SpecialLocation* GetParkLocation() { return park_location_; }
+
   // REVIEW: Add functions that retrive a set of objects by a set of ids?
 
  private:
@@ -50,6 +53,9 @@ class Map {
   std::unordered_set<MapObjectID> location_ids_;
   std::unordered_set<MapObjectID> block_ids_;
   std::unordered_set<MapObjectID> vehicle_ids_;
+
+  SpecialLocation* charge_location_;
+  SpecialLocation* park_location_;
 };
 
 }  // namespace tcs

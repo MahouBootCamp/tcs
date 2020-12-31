@@ -9,6 +9,38 @@ void MapBuilder::Init() {
 }
 
 Map* MapBuilder::Build() {
+  // Set charge & park locations
+  auto points = map_->GetAllPoints();
+  std::unordered_set<MapObjectID> charge_points;
+  std::unordered_set<MapObjectID> park_points;
+  for (auto& p : points) {
+    auto type = p->get_type();
+    if (type == PointType::kCharge)
+      charge_points.insert(p->get_id());
+    else if (type == PointType::kPark)
+      park_points.insert(p->get_id());
+  }
+
+  auto charge_location = std::make_unique<SpecialLocation>(
+      next_id_, kChargeOperation, charge_points);
+  map_->charge_location_ = charge_location.get();
+  map_->location_ids_.insert(next_id_);
+  map_->object_pool_.insert({next_id_, std::move(charge_location)});
+  for (auto& p : charge_points) {
+    map_->get_point(p)->set_linked_location(next_id_);
+  }
+  next_id_ += 1;
+
+  auto park_location =
+      std::make_unique<SpecialLocation>(next_id_, kParkOperation, park_points);
+  map_->park_location_ = park_location.get();
+  map_->location_ids_.insert(next_id_);
+  map_->object_pool_.insert({next_id_, std::move(park_location)});
+  for (auto& p : charge_points) {
+    map_->get_point(p)->set_linked_location(next_id_);
+  }
+  next_id_ += 1;
+
   Map* tmp = map_;
   map_ = nullptr;
   return tmp;

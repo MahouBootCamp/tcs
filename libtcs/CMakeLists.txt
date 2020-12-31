@@ -27,7 +27,7 @@ add_library(libtcs
     src/phase2_assign_next_drive_order.cc
     src/phase3_assign_reserved_order.cc
     src/phase4_assign_free_order.cc
-    src/phase5_recharge_vehicle.cc
+    src/phase5_charge_vehicle.cc
     src/phase6_park_vehicle.cc
     src/reservation_pool.cc
     src/reserve_order_pool.cc

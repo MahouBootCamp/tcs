@@ -13,9 +13,10 @@ class MapService {
   std::unordered_set<Vehicle*> GetAllVehicles() {
     return map_->GetAllVehicles();
   }
-
   Point* GetPoint(MapObjectID point_id) { return map_->get_point(point_id); }
   std::unordered_set<Point*> GetAllPoints() { return map_->GetAllPoints(); }
+  SpecialLocation* GetChargeLocation() { return map_->GetChargeLocation(); }
+  SpecialLocation* GetParkLocation() { return map_->GetParkLocation(); }
 
  private:
   Map* map_;

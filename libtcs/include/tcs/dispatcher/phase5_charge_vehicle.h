@@ -1,6 +1,7 @@
-#ifndef PHASE6_PARK_VEHICLE_H
-#define PHASE6_PARK_VEHICLE_H
+#ifndef PHASE5_CHARGE_VEHICLE_H
+#define PHASE5_CHARGE_VEHICLE_H
 
+#include "tcs/dispatcher/assignment_candidate.h"
 #include "tcs/dispatcher/phase.h"
 #include "tcs/dispatcher/universal_dispatch_util.h"
 #include "tcs/util/order_pool.h"
@@ -9,12 +10,12 @@ namespace tcs {
 
 // UNDONE: We need to review this part
 // NOTE: The phase would be skipped
-class Phase6ParkVehicle : public Phase {
+class Phase5ChargeVehicle : public Phase {
  public:
   void Run() override;
 
  private:
-  void CreateParkOrder(Vehicle* vehicle);
+  void CreateChargeOrder(Vehicle* vehicle);
 
   VehicleService* vehicle_service_;
   MapService* map_service_;
@@ -25,4 +26,4 @@ class Phase6ParkVehicle : public Phase {
 
 }  // namespace tcs
 
-#endif /* PHASE6_PARK_VEHICLE_H */
+#endif /* PHASE5_CHARGE_VEHICLE_H */

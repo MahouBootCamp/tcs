@@ -15,11 +15,12 @@ class Phase1FinishWithdrawal : public Phase {
   void Run() override;
 
  private:
-  void FinishWithDrawal(Vehicle* vehicle);
+  void FinishWithDrawal(Vehicle* vehicle, TransportOrder* order);
 
   IRouter* router_;
   VehicleService* vehicle_service_;
   TransportOrderService* transport_order_service_;
+  MapService* map_service_;
 };
 
 }  // namespace tcs

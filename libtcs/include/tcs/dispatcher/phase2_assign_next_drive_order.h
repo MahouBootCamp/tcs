@@ -28,6 +28,7 @@ class Phase2AssignNextDriveOrder : public Phase {
   VehicleService* vehicle_service_;
   IRouter* router_;
   ControllerPool* controller_pool_;
+  MapService* map_service_;
 };
 
 }  // namespace tcs
