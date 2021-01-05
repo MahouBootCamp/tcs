@@ -13,9 +13,9 @@ ShortestPathAlgorithm::ShortestPathAlgorithm(Map* map)
   }
 
   for (auto& path : paths_) {
-    auto src = point_to_vertex_dict_[map->get_point(path->get_source())];
-    auto dst = point_to_vertex_dict_[map->get_point(path->get_destination())];
-    auto edge = boost::add_edge(src, dst, path->get_length(), graph_);
+    auto src = point_to_vertex_dict_[map->GetPoint(path->GetSource())];
+    auto dst = point_to_vertex_dict_[map->GetPoint(path->GetDestination())];
+    auto edge = boost::add_edge(src, dst, path->GetLength(), graph_);
     if (!edge.second)
       throw std::invalid_argument("Constructing dijkstra algorithm failed");
   }
@@ -83,8 +83,8 @@ std::vector<Step> ShortestPathAlgorithm::PathToSteps(
       i += 1;
       auto path_itr =
           std::find_if(paths_.begin(), paths_.end(), [src, dst](Path* p) {
-            return p->get_source() == src->get_id() &&
-                   p->get_destination() == dst->get_id();
+            return p->GetSource() == src->GetID() &&
+                   p->GetDestination() == dst->GetID();
           });
       step_vertor.push_back({i, src, dst, *path_itr});
     }

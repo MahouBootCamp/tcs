@@ -17,10 +17,10 @@ class Path : public MapResource {
         destination_{destination},
         length_{length} {}
 
-  MapObjectID get_source() { return source_; }
-  MapObjectID get_destination() { return destination_; }
-  double get_length() { return length_; }
-  void set_length(double length) { length_ = length; }
+  MapObjectID GetSource() { return source_; }
+  MapObjectID GetDestination() { return destination_; }
+  double GetLength() { return length_; }
+  void SetLength(double length) { length_ = length; }
 
  private:
   MapObjectID source_;

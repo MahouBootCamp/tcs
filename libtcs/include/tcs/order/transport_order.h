@@ -46,7 +46,7 @@ class TransportOrder {
     if (destinations.back().operation == kParkOperation) dispensable_ = true;
   }
 
-  TransportOrderID get_id() { return id_; }
+  TransportOrderID GetID() { return id_; }
   std::vector<DriveOrder>& get_drive_orders() { return drive_orders_; }
 
   std::vector<DriveOrder> GetFutureDriveOrders() {
@@ -54,17 +54,17 @@ class TransportOrder {
                                    drive_orders_.end());
   }
 
-  std::unordered_set<TransportOrderID>& get_dependencies() {
+  std::unordered_set<TransportOrderID>& GetDependencies() {
     return dependencies_;
   }
 
-  std::size_t get_progress_index() { return progress_index_; }
+  std::size_t GetProgressIndex() { return progress_index_; }
 
-  TransportOrderState get_state() { return state_; }
+  TransportOrderState GetState() { return state_; }
 
-  MapObjectRef get_vehicle() { return vehicle_; }
+  MapObjectRef GetVehicle() { return vehicle_; }
 
-  bool get_dispensable() { return dispensable_; }
+  bool GetDispensable() { return dispensable_; }
 
  private:
   TransportOrderID id_;

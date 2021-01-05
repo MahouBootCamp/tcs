@@ -45,8 +45,8 @@ class OrderPoolTest : public ::testing::Test {
 TEST_F(OrderPoolTest, DefaultTest) {
   OrderPool order_pool(map_.get());
   auto order0 = order_pool.AddOrder({{15, "Load"}, {16, "Unload"}});
-  auto order0_ptr = order_pool.get_order(order0);
+  auto order0_ptr = order_pool.GetOrder(order0);
   ASSERT_TRUE(order0_ptr);
   ASSERT_EQ(order0_ptr->get_drive_orders().size(), 2);
-  ASSERT_EQ(order0_ptr->get_dependencies().size(), 0);
+  ASSERT_EQ(order0_ptr->GetDependencies().size(), 0);
 }

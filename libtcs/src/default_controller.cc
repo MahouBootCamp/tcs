@@ -24,7 +24,7 @@ DefaultController::DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
 }
 
 void DefaultController::UpdatePositionEventHandler(MapObjectID point) {
-  vehicle_->set_current_point(point);
+  vehicle_->SetCurrentPoint(point);
 }
 
 void DefaultController::FinishCommandEventHandler(MovementCommand cmd) {
@@ -35,18 +35,18 @@ void DefaultController::FinishCommandEventHandler(MovementCommand cmd) {
   }
 
   if (cmd.operation == kChargeOperation) {
-    vehicle_->set_finish_charge(true);
-    vehicle_->set_need_charge(false);
+    vehicle_->SetFinishCharge(true);
+    vehicle_->SetNeedCharge(false);
   }
-  vehicle_->set_route_progress_index(vehicle_->get_route_progress_index() + 1);
+  vehicle_->SetRouteProgressIndex(vehicle_->GetRouteProgressIndex() + 1);
   auto resources = std::move(allocated_resources_.front());
   allocated_resources_.pop_front();
   scheduler_->Free(this, resources);
   // Check if current drive order is finished：
   // No command unsent and vehicle has finished final step.
   if (HasFinishedOrAbortedDriveOrder()) {
-    vehicle_->set_route_progress_index(0);
-    vehicle_->set_process_state(
+    vehicle_->SetRouteProgressIndex(0);
+    vehicle_->SetProcessState(
         ProcessState::kAwaitingOrder);  // The dispatcher would notice this
                                         // state change in next phase
     current_drive_order_.reset();
@@ -60,11 +60,11 @@ void DefaultController::FailCommandEventHandler(MovementCommand cmd) {
 }
 
 void DefaultController::RequestChargeEventHandler() {
-  vehicle_->set_need_charge(true);
+  vehicle_->SetNeedCharge(true);
 }
 
 void DefaultController::UpdateVehicleStateEventHandler(VehicleState state) {
-  vehicle_->set_vehicle_state(state);
+  vehicle_->SetVehicleState(state);
 }
 
 bool DefaultController::AllocationSuccessful(
@@ -94,13 +94,13 @@ void DefaultController::AllocationFailed() {
 
 void DefaultController::SetDriveOrder(DriveOrder order) {
   if (current_drive_order_.has_value())
-    throw std::runtime_error("vehicle " + std::to_string(vehicle_->get_id()) +
+    throw std::runtime_error("vehicle " + std::to_string(vehicle_->GetID()) +
                              " already has an order");
-  BOOST_LOG_TRIVIAL(debug) << "vehicle " << vehicle_->get_id()
+  BOOST_LOG_TRIVIAL(debug) << "vehicle " << vehicle_->GetID()
                            << " setting driveorder";
   scheduler_->Claim(this, ExpandDriveOrder(order));
   current_drive_order_ = order;
-  vehicle_->set_route_progress_index(0);
+  vehicle_->SetRouteProgressIndex(0);
   CreateFutureCommands(order);
   if (CanSendNextCommand()) {
     AllocateForNextCommand();
@@ -112,7 +112,7 @@ void DefaultController::AbortDriveOrder(bool immediately) {
     current_drive_order_.reset();
     waiting_for_allocation_ = false;
     pending_resources_.clear();
-    vehicle_->set_route_progress_index(0);
+    vehicle_->SetRouteProgressIndex(0);
 
     adapter_->ClearCommandQueue();
     command_queue_.clear();
@@ -134,7 +134,7 @@ void DefaultController::AbortDriveOrder(bool immediately) {
 
 void DefaultController::InitPosition(MapResource* point) {
   scheduler_->AllocateNow(this, {point});
-  vehicle_->set_current_point(point->get_id());
+  vehicle_->SetCurrentPoint(point->GetID());
   // TODO: Set controller private status of this allocation
   // UNDONE: MARK WHERE I STOPPED...
 }
@@ -142,7 +142,7 @@ void DefaultController::InitPosition(MapResource* point) {
 std::vector<std::unordered_set<MapResource*>>
 DefaultController::ExpandDriveOrder(DriveOrder& order) {
   std::vector<std::unordered_set<MapResource*>> res;
-  auto& steps = order.get_route()->get_steps();
+  auto& steps = order.GetRoute()->GetSteps();
   for (auto& step : steps) {
     res.push_back({step.destination, step.path});
   }
@@ -152,8 +152,8 @@ DefaultController::ExpandDriveOrder(DriveOrder& order) {
 void DefaultController::CreateFutureCommands(DriveOrder& order) {
   // REVIEW: command_queue_.clear() ?
 
-  std::string operation = order.get_destination().operation;
-  auto& steps = order.get_route()->get_steps();
+  std::string operation = order.GetDestination().operation;
+  auto& steps = order.GetRoute()->GetSteps();
   auto sz = steps.size();
   for (auto index = 0; index != sz; ++index) {
     bool is_last_movement = index + 1 == sz;

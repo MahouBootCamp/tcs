@@ -18,7 +18,7 @@ struct AssignmentCandidate {
         drive_orders{drive_orders} {
     total_cost = 0;
     for (auto& drive_order : drive_orders.value())
-      total_cost += drive_order.get_route()->get_cost();
+      total_cost += drive_order.GetRoute()->GetCost();
   }
 };
 

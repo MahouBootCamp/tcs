@@ -9,7 +9,7 @@ enum class KernalState { kIdle, kOperating, kExit };
 
 class IKernal {
  public:
-  virtual KernalState get_state() = 0;
+  virtual KernalState GetState() = 0;
   virtual void Start() = 0;
   virtual void Exit() = 0;
   virtual void EnableVehicle() = 0;

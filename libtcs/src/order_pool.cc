@@ -2,7 +2,7 @@
 
 namespace tcs {
 
-TransportOrder* OrderPool::get_order(TransportOrderID id) {
+TransportOrder* OrderPool::GetOrder(TransportOrderID id) {
   // std::scoped_lock<std::recursive_mutex> lk{mut_};
   auto itr = order_pool_.find(id);
   if (itr == order_pool_.end())
@@ -16,13 +16,13 @@ TransportOrderID OrderPool::AddOrder(
     std::unordered_set<TransportOrderID> dependencies) {
   // Check validity
   for (auto& dst : destinations) {
-    auto site = map_->get_resource(dst.site);
-    if (!site || site->get_type() == MapObjectType::kPath)
+    auto site = map_->GetResource(dst.site);
+    if (!site || site->GetType() == MapObjectType::kPath)
       throw std::invalid_argument("Destination invalid");
   }
 
   for (auto& transport_order : dependencies) {
-    if (!get_order(transport_order))
+    if (!GetOrder(transport_order))
       throw std::invalid_argument("Dependency invalid");
   }
 

@@ -4,20 +4,20 @@ namespace tcs {
 
 void Phase3AssignReservedOrder::Run() {
   auto vehicles = vehicle_service_->FilterBy([](Vehicle* v) {
-    return v->get_process_state() == ProcessState::kIdle &&
-           (v->get_vehicle_state() == VehicleState::kIdle ||
-            v->get_vehicle_state() == VehicleState::kCharging);
+    return v->GetProcessState() == ProcessState::kIdle &&
+           (v->GetVehicleState() == VehicleState::kIdle ||
+            v->GetVehicleState() == VehicleState::kCharging);
   });
   for (auto& vehicle : vehicles) CheckForReservedOrder(vehicle);
 }
 
 void Phase3AssignReservedOrder::CheckForReservedOrder(Vehicle* vehicle) {
   auto reserved_orders =
-      reserve_order_pool_->GetReservationsByVehicle(vehicle->get_id());
+      reserve_order_pool_->GetReservationsByVehicle(vehicle->GetID());
   TransportOrder* selected_order = nullptr;
   for (auto& order_id : reserved_orders) {
     auto order = transport_order_service_->GetTransportOrder(order_id);
-    if (order->get_state() == TransportOrderState::kDispatchable) {
+    if (order->GetState() == TransportOrderState::kDispatchable) {
       selected_order = order;
       break;
     }
@@ -25,9 +25,9 @@ void Phase3AssignReservedOrder::CheckForReservedOrder(Vehicle* vehicle) {
 
   if (!selected_order) return;
 
-  reserve_order_pool_->RemoveReservationByOrder(selected_order->get_id());
+  reserve_order_pool_->RemoveReservationByOrder(selected_order->GetID());
   auto current_point =
-      map_service_->GetPoint(vehicle->get_current_point().value());
+      map_service_->GetPoint(vehicle->GetCurrentPoint().value());
   auto drive_order = router_->GetRoute(current_point, selected_order);
   if (!drive_order.has_value())
     // REVIEW: Next point of vehicle may be unroutable?

@@ -19,11 +19,11 @@ TEST_F(MapBuilderTest, AddPointAndPath) {
 
   unique_ptr<Map> map{builder.Build()};
 
-  auto point_ptr0 = map->get_point(point0);
+  auto point_ptr0 = map->GetPoint(point0);
   ASSERT_TRUE(point_ptr0);
-  ASSERT_EQ(point_ptr0->get_out_paths().size(), 1);
-  ASSERT_NE(point_ptr0->get_out_paths().find(path2),
-            point_ptr0->get_out_paths().end());
+  ASSERT_EQ(point_ptr0->GetOutPaths().size(), 1);
+  ASSERT_NE(point_ptr0->GetOutPaths().find(path2),
+            point_ptr0->GetOutPaths().end());
 }
 
 TEST_F(MapBuilderTest, RemovePoint) {
@@ -35,9 +35,9 @@ TEST_F(MapBuilderTest, RemovePoint) {
 
   unique_ptr<Map> map{builder.Build()};
 
-  auto point_ptr1 = map->get_point(point1);
+  auto point_ptr1 = map->GetPoint(point1);
   ASSERT_TRUE(point_ptr1);
-  ASSERT_EQ(point_ptr1->get_in_paths().size(), 0);
+  ASSERT_EQ(point_ptr1->GetInPaths().size(), 0);
 }
 
 TEST_F(MapBuilderTest, RemovePath) {
@@ -49,9 +49,9 @@ TEST_F(MapBuilderTest, RemovePath) {
 
   unique_ptr<Map> map{builder.Build()};
 
-  auto point_ptr1 = map->get_point(point1);
+  auto point_ptr1 = map->GetPoint(point1);
   ASSERT_TRUE(point_ptr1);
-  ASSERT_EQ(point_ptr1->get_in_paths().size(), 0);
+  ASSERT_EQ(point_ptr1->GetInPaths().size(), 0);
 }
 
 TEST_F(MapBuilderTest, AddLocation) {
@@ -64,9 +64,9 @@ TEST_F(MapBuilderTest, AddLocation) {
 
   unique_ptr<Map> map{builder.Build()};
 
-  auto location_ptr3 = map->get_location(location3);
+  auto location_ptr3 = map->GetLocation(location3);
   ASSERT_TRUE(location_ptr3);
-  ASSERT_EQ(location_ptr3->get_linked_points().size(), 2);
+  ASSERT_EQ(location_ptr3->GetLinkedPoints().size(), 2);
 }
 
 TEST_F(MapBuilderTest, UnlinkLocation) {
@@ -80,15 +80,15 @@ TEST_F(MapBuilderTest, UnlinkLocation) {
 
   unique_ptr<Map> map{builder.Build()};
 
-  auto location_ptr3 = map->get_location(location3);
-  auto point_ptr0 = map->get_point(point0);
-  auto point_ptr1 = map->get_point(point1);
+  auto location_ptr3 = map->GetLocation(location3);
+  auto point_ptr0 = map->GetPoint(point0);
+  auto point_ptr1 = map->GetPoint(point1);
   ASSERT_TRUE(location_ptr3);
   ASSERT_TRUE(point_ptr0);
   ASSERT_TRUE(point_ptr1);
-  ASSERT_EQ(location_ptr3->get_linked_points().size(), 1);
-  ASSERT_FALSE(point_ptr0->get_linked_location().has_value());
-  ASSERT_TRUE(point_ptr1->get_linked_location().has_value());
+  ASSERT_EQ(location_ptr3->GetLinkedPoints().size(), 1);
+  ASSERT_FALSE(point_ptr0->GetLinkedLocation().has_value());
+  ASSERT_TRUE(point_ptr1->GetLinkedLocation().has_value());
 }
 
 TEST_F(MapBuilderTest, AddBlock) {
@@ -104,16 +104,16 @@ TEST_F(MapBuilderTest, AddBlock) {
 
   unique_ptr<Map> map{builder.Build()};
 
-  auto block_ptr5 = map->get_block(block5);
-  auto block_ptr6 = map->get_block(block6);
+  auto block_ptr5 = map->GetBlock(block5);
+  auto block_ptr6 = map->GetBlock(block6);
   ASSERT_TRUE(block_ptr5);
   ASSERT_TRUE(block_ptr6);
-  ASSERT_NE(block_ptr5->get_resources().find(point0),
-            block_ptr5->get_resources().end());
-  ASSERT_EQ(block_ptr6->get_resources().find(point0),
-            block_ptr6->get_resources().end());
-  ASSERT_EQ(block_ptr5->get_resources().size(), 2);
-  ASSERT_EQ(block_ptr6->get_resources().size(), 2);
+  ASSERT_NE(block_ptr5->GetResources().find(point0),
+            block_ptr5->GetResources().end());
+  ASSERT_EQ(block_ptr6->GetResources().find(point0),
+            block_ptr6->GetResources().end());
+  ASSERT_EQ(block_ptr5->GetResources().size(), 2);
+  ASSERT_EQ(block_ptr6->GetResources().size(), 2);
 }
 
 TEST_F(MapBuilderTest, RemoveBlock) {
@@ -132,11 +132,11 @@ TEST_F(MapBuilderTest, RemoveBlock) {
 
   unique_ptr<Map> map{builder.Build()};
 
-  auto block_ptr5 = map->get_block(block5);
-  auto block_ptr6 = map->get_block(block6);
+  auto block_ptr5 = map->GetBlock(block5);
+  auto block_ptr6 = map->GetBlock(block6);
   ASSERT_TRUE(block_ptr5);
   ASSERT_FALSE(block_ptr6);
-  ASSERT_EQ(block_ptr5->get_resources().find(point0),
-            block_ptr5->get_resources().end());
-  ASSERT_EQ(block_ptr5->get_resources().size(), 1);
+  ASSERT_EQ(block_ptr5->GetResources().find(point0),
+            block_ptr5->GetResources().end());
+  ASSERT_EQ(block_ptr5->GetResources().size(), 1);
 }

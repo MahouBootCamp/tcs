@@ -21,12 +21,12 @@ class Map {
   friend class MapBuilder;
 
  public:
-  MapResource* get_resource(MapObjectID id);
-  Point* get_point(MapObjectID id);
-  Path* get_path(MapObjectID id);
-  Location* get_location(MapObjectID id);
-  Block* get_block(MapObjectID id);
-  Vehicle* get_vehicle(MapObjectID id);
+  MapResource* GetResource(MapObjectID id);
+  Point* GetPoint(MapObjectID id);
+  Path* GetPath(MapObjectID id);
+  Location* GetLocation(MapObjectID id);
+  Block* GetBlock(MapObjectID id);
+  Vehicle* GetVehicle(MapObjectID id);
 
   std::unordered_set<MapResource*> GetResources(
       std::unordered_set<MapObjectID>& id_set);

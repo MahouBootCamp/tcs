@@ -20,13 +20,13 @@ class DriveOrder {
  public:
   DriveOrder(Destination destination) : destination_{destination} {}
 
-  Destination get_destination() { return destination_; }
+  Destination GetDestination() { return destination_; }
 
-  std::optional<Route>& get_route() { return route_; }
-  void set_rotue(std::optional<Route> route) { route_ = route; }
+  std::optional<Route>& GetRoute() { return route_; }
+  void SetRoute(std::optional<Route> route) { route_ = route; }
 
-  DriveOrderState get_state() { return state_; }
-  void set_state(DriveOrderState state) { state_ = state; }
+  DriveOrderState GetState() { return state_; }
+  void SetState(DriveOrderState state) { state_ = state; }
 
  private:
   Destination destination_;

@@ -10,18 +10,18 @@ void Phase0CheckNewOrder::Run() {
     // Check routability
     if (!router_->ChechRoutability(order)) {
       transport_order_service_->UpdateOrderState(
-          order->get_id(), TransportOrderState::kUnRoutable);
+          order->GetID(), TransportOrderState::kUnRoutable);
       continue;
     }
 
     // Ready for dispatch
-    transport_order_service_->UpdateOrderState(order->get_id(),
+    transport_order_service_->UpdateOrderState(order->GetID(),
                                                TransportOrderState::kActive);
 
     // Check Dependencies. Dispatch if dependencies finished.
-    if (transport_order_service_->HasUnfinishedDependencies(order->get_id()))
+    if (transport_order_service_->HasUnfinishedDependencies(order->GetID()))
       transport_order_service_->UpdateOrderState(
-          order->get_id(), TransportOrderState::kDispatchable);
+          order->GetID(), TransportOrderState::kDispatchable);
   }
 }
 

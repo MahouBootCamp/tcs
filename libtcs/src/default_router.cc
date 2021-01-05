@@ -27,7 +27,7 @@ std::optional<Route> DefaultRouter::GetRoute(Point *start_point,
 }
 
 double DefaultRouter::GetCost(Point *start_point, Point *destination_point) {
-  return algo_.ComputeRoute(start_point, destination_point)->get_cost();
+  return algo_.ComputeRoute(start_point, destination_point)->GetCost();
 }
 
 void DefaultRouter::SelectRoute(Vehicle *vehicle,
@@ -47,22 +47,22 @@ std::unordered_set<Point *> DefaultRouter::GetTargetedPoints() {
   std::unordered_set<Point *> res;
   for (auto &pair : selected_routes_) {
     res.insert(
-        pair.second.back().get_route().value().get_steps().back().destination);
+        pair.second.back().GetRoute().value().GetSteps().back().destination);
   }
   return res;
 }
 
 std::unordered_set<Point *> DefaultRouter::ExpandDestination(
     DriveOrder &drive_order) {
-  auto dst_id = drive_order.get_destination().site;
-  auto location = map_->get_location(dst_id);
+  auto dst_id = drive_order.GetDestination().site;
+  auto location = map_->GetLocation(dst_id);
   if (location) {
     std::unordered_set<Point *> res;
-    for (auto &point_id : location->get_linked_points())
-      res.insert(map_->get_point(point_id));
+    for (auto &point_id : location->GetLinkedPoints())
+      res.insert(map_->GetPoint(point_id));
     return res;
   } else
-    return {map_->get_point(dst_id)};
+    return {map_->GetPoint(dst_id)};
 }
 
 bool DefaultRouter::CheckRoutability(std::vector<DriveOrder> &drive_orders,
@@ -104,8 +104,8 @@ void DefaultRouter::ComputeRoute(std::vector<DriveOrder> &drive_orders,
     for (auto dst : points) {
       auto route = GetRoute(point, dst);
       if (!route.has_value()) continue;
-      result.current_cost = cost + route->get_cost();
-      result.current_route[index].set_rotue(std::move(route));
+      result.current_cost = cost + route->GetCost();
+      result.current_route[index].SetRoute(std::move(route));
       ComputeRoute(drive_orders, result, index + 1, dst);
       routable = true;
     }

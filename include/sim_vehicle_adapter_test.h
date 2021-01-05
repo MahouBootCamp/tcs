@@ -42,9 +42,9 @@ void SimVehicleAdapterTest() {
   std::unique_ptr<tcs::Map> map_{ProductVehicleAdapterTestMap()};
   tcs::SimVehicleAdapter adapter;
 
-  tcs::Step step0{0, map_->get_point(0), map_->get_point(1), map_->get_path(7)};
-  tcs::Step step1{1, map_->get_point(1), map_->get_point(2),
-                  map_->get_path(10)};
+  tcs::Step step0{0, map_->GetPoint(0), map_->GetPoint(1), map_->GetPath(7)};
+  tcs::Step step1{1, map_->GetPoint(1), map_->GetPoint(2),
+                  map_->GetPath(10)};
 
   adapter.Enable();
   adapter.EnqueueCommand({step0, "Load", false});

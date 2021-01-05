@@ -29,26 +29,26 @@ class Point : public MapResource {
         coordinate_{coordinate},
         point_type_{type} {}
 
-  Coordinate get_coordinate() { return coordinate_; }
-  void set_coordinate(Coordinate coordinate) { coordinate_ = coordinate; }
+  Coordinate GetCoordinate() { return coordinate_; }
+  void SetCoordinate(Coordinate coordinate) { coordinate_ = coordinate; }
 
-  PointType get_type() { return point_type_; }
+  PointType GetType() { return point_type_; }
 
   void AddInPath(MapObjectID path_id) { in_paths_.insert(path_id); }
   void RemoveInPath(MapObjectID path_id) { in_paths_.erase(path_id); }
-  std::unordered_set<MapObjectID>& get_in_paths() { return in_paths_; }
+  std::unordered_set<MapObjectID>& GetInPaths() { return in_paths_; }
 
   void AddOutPath(MapObjectID path_id) { out_paths_.insert(path_id); }
   void RemoveOutPath(MapObjectID path_id) { out_paths_.erase(path_id); }
-  std::unordered_set<MapObjectID>& get_out_paths() { return out_paths_; }
+  std::unordered_set<MapObjectID>& GetOutPaths() { return out_paths_; }
 
-  MapObjectRef get_linked_location() { return linked_location_; }
-  void set_linked_location(MapObjectRef location_ref) {
+  MapObjectRef GetLinkedLocation() { return linked_location_; }
+  void SetLinkedLocation(MapObjectRef location_ref) {
     linked_location_ = location_ref;
   }
 
-  MapObjectRef get_occupying_vehicle() { return occupying_vehicle_; }
-  void set_occupying_vehicle(MapObjectRef vehicle_ref) {
+  MapObjectRef GetOccupyingVehicle() { return occupying_vehicle_; }
+  void SetOccupyingVehicle(MapObjectRef vehicle_ref) {
     occupying_vehicle_ = vehicle_ref;
   }
 

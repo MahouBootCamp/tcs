@@ -25,7 +25,7 @@ class Kernal : public IKernal {
   Kernal() : executor_{kExecutorThreads} {}
   ~Kernal();
 
-  KernalState get_state() override { return state_; }
+  KernalState GetState() override { return state_; }
   void Start() override;
 
   void Exit() override;

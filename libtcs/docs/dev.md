@@ -4,14 +4,15 @@
 
 ## TODOs
 
-- [ ] 梳理Dispatcher、Scheduler、VehicleController、VehicleAdapter相关业务逻辑
-  - [ ] 订单逻辑
-  - [ ] DriveOrder执行逻辑
-- [ ] 命名风格修改：成员函数一律大写
+- [x] 梳理Dispatcher、Scheduler、VehicleController、VehicleAdapter相关业务逻辑
+  - [x] 订单逻辑
+  - [x] DriveOrder执行逻辑
+- [x] 命名风格修改：成员函数一律大写
 - [ ] 完善Service设施
 - [ ] 搭建一个可用测试的Kernal
 - [ ] 对各组件的单元测试
 - [ ] 系统测试
+- [ ] 添加const约束
 - [ ] 进一步开发：
   - [ ] 低电量载具充电、空闲载具停泊逻辑。
 
@@ -135,8 +136,6 @@ Controller处理`FinishCommandEvent`时，会将请求资源栈的首元素弹�
 如果没有后续指令，则意味着整个DriveOrder结束，重置载具进度为0，载具执行状态为`kAwaitingOrder`。
 
 ### 撤销DriveOrder逻辑
-
-
 
 ### DriveOrder执行失败逻辑
 

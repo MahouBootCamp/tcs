@@ -111,10 +111,10 @@ std::unordered_set<MapResource *> DefaultScheduler::ExpandBlocks(
   std::unordered_set<MapResource *> expanded_resources{
       resources};  // Copy original set
   for (auto &resource : expanded_resources) {
-    auto &blocks = resource->get_blocks();
+    auto &blocks = resource->GetBlocks();
     for (auto &block : blocks) {
       auto block_resources =
-          map_->GetResources(map_->get_block(block)->get_resources());
+          map_->GetResources(map_->GetBlock(block)->GetResources());
       expanded_resources.insert(block_resources.begin(), block_resources.end());
     }
   }

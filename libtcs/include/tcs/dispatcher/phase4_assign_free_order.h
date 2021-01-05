@@ -14,9 +14,9 @@ class Phase4AssignFreeOrder : public Phase {
   std::unordered_set<Vehicle*> FilterAvailableVehicles();
   std::unordered_set<TransportOrder*> FilterDispatchableTransportOrders();
   bool CanBypassDriveOrder(DriveOrder& drive_order, Vehicle* vehicle) {
-    return drive_order.get_route()->get_steps().back().destination->get_id() ==
-               vehicle->get_current_point().value() &&
-           drive_order.get_destination().operation == kNoOperation;
+    return drive_order.GetRoute()->GetSteps().back().destination->GetID() ==
+               vehicle->GetCurrentPoint().value() &&
+           drive_order.GetDestination().operation == kNoOperation;
   }
   void AssignOrder(AssignmentCandidate& candidate);
   void TryAssignByVehicle(Vehicle* vehicle,

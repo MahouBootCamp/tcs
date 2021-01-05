@@ -22,13 +22,13 @@ class Location : public MapResource {
 
   void AddOperation(std::string operation) { operations_.insert(operation); }
   void RemoveOperation(std::string operation) { operations_.erase(operation); }
-  std::unordered_set<std::string>& get_operations() { return operations_; }
+  std::unordered_set<std::string>& GetOperations() { return operations_; }
 
   void AddLinkedPoint(MapObjectID point_id) { linked_points_.insert(point_id); }
   void RemoveLinkedPoint(MapObjectID point_id) {
     linked_points_.erase(point_id);
   }
-  std::unordered_set<MapObjectID>& get_linked_points() {
+  std::unordered_set<MapObjectID>& GetLinkedPoints() {
     return linked_points_;
   }
 

@@ -30,39 +30,39 @@ class Vehicle : public MapObject {
  public:
   Vehicle(MapObjectID id) : MapObject{id, MapObjectType::kVehicle} {}
 
-  bool get_need_charge() { return need_charge_; }
-  void set_need_charge(bool need_charge) { need_charge_ = need_charge; }
+  bool GetNeedCharge() { return need_charge_; }
+  void SetNeedCharge(bool need_charge) { need_charge_ = need_charge; }
 
-  bool get_finish_charge() { return finish_charge_; }
-  void set_finish_charge(bool finish_charge) { finish_charge_ = finish_charge; }
+  bool GetFinishCharge() { return finish_charge_; }
+  void SetFinishCharge(bool finish_charge) { finish_charge_ = finish_charge; }
 
-  VehicleState get_vehicle_state() { return vehicle_state_; }
-  void set_vehicle_state(VehicleState vehicle_state) {
+  VehicleState GetVehicleState() { return vehicle_state_; }
+  void SetVehicleState(VehicleState vehicle_state) {
     vehicle_state_ = vehicle_state;
   }
 
-  IntegrationLevel get_integration_level() { return integration_level_; }
-  void set_integration_level(IntegrationLevel integration_level) {
+  IntegrationLevel GetIntegrationLevel() { return integration_level_; }
+  void SetIntegrationLevel(IntegrationLevel integration_level) {
     integration_level_ = integration_level;
   }
 
-  ProcessState get_process_state() { return process_state_; }
-  void set_process_state(ProcessState process_state) {
+  ProcessState GetProcessState() { return process_state_; }
+  void SetProcessState(ProcessState process_state) {
     process_state_ = process_state;
   }
 
-  TransportOrderRef get_transport_order() { return transport_order_; }
-  void set_transport_order(TransportOrderRef order_ref) {
+  TransportOrderRef GetTransportOrder() { return transport_order_; }
+  void SetTransportOrder(TransportOrderRef order_ref) {
     transport_order_ = order_ref;
   }
 
-  std::size_t get_route_progress_index() { return route_progress_index_; }
-  void set_route_progress_index(std::size_t index) {
+  std::size_t GetRouteProgressIndex() { return route_progress_index_; }
+  void SetRouteProgressIndex(std::size_t index) {
     route_progress_index_ = index;
   }
 
-  MapObjectRef get_current_point() { return current_point_; }
-  void set_current_point(MapObjectRef point_ref) { current_point_ = point_ref; }
+  MapObjectRef GetCurrentPoint() { return current_point_; }
+  void SetCurrentPoint(MapObjectRef point_ref) { current_point_ = point_ref; }
 
  private:
   bool need_charge_ = false;

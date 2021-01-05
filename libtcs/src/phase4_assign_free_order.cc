@@ -38,22 +38,22 @@ std::unordered_set<Vehicle*> Phase4AssignFreeOrder::FilterAvailableVehicles() {
   std::unordered_set<Vehicle*> result;
   for (auto& vehicle : all_vehicles) {
     bool process_no_order =
-        vehicle->get_process_state() == ProcessState::kIdle &&
-        (vehicle->get_vehicle_state() == VehicleState::kIdle ||
-         vehicle->get_vehicle_state() == VehicleState::kCharging);
+        vehicle->GetProcessState() == ProcessState::kIdle &&
+        (vehicle->GetVehicleState() == VehicleState::kIdle ||
+         vehicle->GetVehicleState() == VehicleState::kCharging);
 
     bool process_dispensable_order =
-        vehicle->get_process_state() == ProcessState::kProcessingOrder &&
+        vehicle->GetProcessState() == ProcessState::kProcessingOrder &&
         transport_order_service_
-            ->GetTransportOrder(vehicle->get_transport_order().value())
-            ->get_dispensable();
+            ->GetTransportOrder(vehicle->GetTransportOrder().value())
+            ->GetDispensable();
 
-    if (vehicle->get_integration_level() ==
+    if (vehicle->GetIntegrationLevel() ==
             IntegrationLevel::kUtilized &&           // Utilized
-        vehicle->get_current_point().has_value() &&  // Know position
-        !vehicle->get_need_charge() &&               // Do not need charge
+        vehicle->GetCurrentPoint().has_value() &&  // Know position
+        !vehicle->GetNeedCharge() &&               // Do not need charge
         (process_no_order || process_dispensable_order) &&
-        reserve_order_pool_->GetReservationsByVehicle(vehicle->get_id())
+        reserve_order_pool_->GetReservationsByVehicle(vehicle->GetID())
             .empty())  // Not reserved for order
       result.insert(vehicle);
   }
@@ -66,15 +66,15 @@ Phase4AssignFreeOrder::FilterDispatchableTransportOrders() {
   auto dispatchable_orders = transport_order_service_->FilterOrdersByState(
       TransportOrderState::kDispatchable);
   for (auto& order : dispatchable_orders) {
-    if (!reserve_order_pool_->IsReserved(order->get_id())) result.insert(order);
+    if (!reserve_order_pool_->IsReserved(order->GetID())) result.insert(order);
   }
   return result;
 }
 
 void Phase4AssignFreeOrder::AssignOrder(AssignmentCandidate& candidate) {
-  auto vehicle_id = candidate.vehicle->get_id();
-  auto order_id = candidate.transport_order->get_id();
-  if (candidate.vehicle->get_transport_order().has_value()) {
+  auto vehicle_id = candidate.vehicle->GetID();
+  auto order_id = candidate.transport_order->GetID();
+  if (candidate.vehicle->GetTransportOrder().has_value()) {
     // If has dispensable order, abort it and reserve new order to wait for
     // abortion.
     BOOST_LOG_TRIVIAL(debug)
@@ -115,10 +115,10 @@ void Phase4AssignFreeOrder::TryAssignByVehicle(
     Vehicle* vehicle, std::unordered_set<TransportOrder*>& orders,
     std::unordered_set<TransportOrder*>& assigned_orders) {
   BOOST_LOG_TRIVIAL(debug) << "Trying to find an order for vehicle "
-                           << vehicle->get_id();
+                           << vehicle->GetID();
   std::vector<AssignmentCandidate> candidates;
   auto current_point =
-      map_service_->GetPoint(vehicle->get_current_point().value());
+      map_service_->GetPoint(vehicle->GetCurrentPoint().value());
   for (auto& order : orders) {
     if (assigned_orders.find(order) == assigned_orders.end()) {
       auto drive_orders = router_->GetRoute(current_point, order);
@@ -132,7 +132,7 @@ void Phase4AssignFreeOrder::TryAssignByVehicle(
 
   if (candidates.size() == 0) {
     BOOST_LOG_TRIVIAL(debug)
-        << "No order routable for vehicle " << vehicle->get_id();
+        << "No order routable for vehicle " << vehicle->GetID();
     return;
   } else {
     std::sort(candidates.begin(), candidates.end(),
@@ -149,11 +149,11 @@ void Phase4AssignFreeOrder::TryAssignByOrder(
     TransportOrder* order, std::unordered_set<Vehicle*>& vehicles,
     std::unordered_set<Vehicle*>& assigned_vehicles) {
   BOOST_LOG_TRIVIAL(debug) << "Trying to find a vehicle for transport order "
-                           << order->get_id();
+                           << order->GetID();
   std::vector<AssignmentCandidate> candidates;
   for (auto& vehicle : vehicles) {
     auto current_point =
-        map_service_->GetPoint(vehicle->get_current_point().value());
+        map_service_->GetPoint(vehicle->GetCurrentPoint().value());
     if (assigned_vehicles.find(vehicle) == assigned_vehicles.end()) {
       auto drive_orders = router_->GetRoute(current_point, order);
       if (drive_orders.has_value()) {
@@ -166,7 +166,7 @@ void Phase4AssignFreeOrder::TryAssignByOrder(
 
   if (candidates.size() == 0) {
     BOOST_LOG_TRIVIAL(debug)
-        << "No vehicle routable for transport order " << order->get_id();
+        << "No vehicle routable for transport order " << order->GetID();
     return;
   } else {
     std::sort(candidates.begin(), candidates.end(),

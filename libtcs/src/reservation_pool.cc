@@ -73,7 +73,7 @@ std::unordered_set<MapResource *> ReservationPool::GetFreeableResources(
       res.insert(resource);
     else
       BOOST_LOG_TRIVIAL(warning)
-          << "Freeing resource " << resource->get_id()
+          << "Freeing resource " << resource->GetID()
           << " is not reserved for vehicle " << entry.vehicle->GetVehicleID();
   }
   return res;

@@ -4,7 +4,7 @@ namespace tcs {
 
 void ControllerPool::AttachVehicleController(MapObjectID vehicle,
                                              IVehicleAdapter* adapter) {
-  auto vehicle_ptr = map_->get_vehicle(vehicle);
+  auto vehicle_ptr = map_->GetVehicle(vehicle);
   if (!vehicle_ptr) throw std::invalid_argument("Vehicle not found");
   if (!adapter) adapter = new SimVehicleAdapter{};
   auto ptr =

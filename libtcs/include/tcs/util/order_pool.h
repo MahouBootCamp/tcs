@@ -20,7 +20,7 @@ class OrderPool {
   // Map* MUST NOT be nullptr
   OrderPool(Map* map) : map_{map} {}
 
-  TransportOrder* get_order(TransportOrderID);
+  TransportOrder* GetOrder(TransportOrderID);
   TransportOrderID AddOrder(
       std::vector<Destination> destinations,
       std::unordered_set<TransportOrderID> dependencies = {});

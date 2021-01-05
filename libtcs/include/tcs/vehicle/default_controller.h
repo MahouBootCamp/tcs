@@ -20,7 +20,7 @@ class DefaultController : public IVehicleController {
   DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
                     IScheduler* scheduler);
 
-  MapObjectID GetVehicleID() override { return vehicle_->get_id(); }
+  MapObjectID GetVehicleID() override { return vehicle_->GetID(); }
 
   void UpdatePositionEventHandler(MapObjectID point);
 
