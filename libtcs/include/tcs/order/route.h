@@ -18,6 +18,11 @@ struct Step {
   // MapObjectID path;
 };
 
+inline bool operator==(const Step& s1, const Step& s2) {
+  return s1.index == s2.index && s1.source == s2.source &&
+         s1.destination == s2.destination && s1.path == s2.path;
+}
+
 class Route {
  public:
   Route() = default;

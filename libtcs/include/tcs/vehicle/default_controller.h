@@ -73,11 +73,22 @@ class DefaultController : public IVehicleController {
 
   std::unordered_set<MapResource*> ExpandMovementCommand(MovementCommand& cmd);
 
+  bool CanSendNextCommand() {
+    return adapter_->CanEnqueueCommand() && command_queue_.size() > 0 &&
+           !waiting_for_allocation_;
+  }
+
+  bool HasFinishedOrAbortedDriveOrder() {
+    return command_sent_.empty() && command_queue_.empty() &&
+           !pending_command_.has_value();
+  }
+
   Vehicle* vehicle_;
   std::unique_ptr<IVehicleAdapter> adapter_;
   IScheduler* scheduler_;
   std::optional<DriveOrder> current_drive_order_ = std::nullopt;
   std::list<MovementCommand> command_queue_;
+  std::list<MovementCommand> command_sent_;
   std::optional<MovementCommand> pending_command_;
   std::unordered_set<MapResource*> pending_resources_;
   bool waiting_for_allocation_ = false;

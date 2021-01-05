@@ -24,6 +24,14 @@ class UniversalDispatchUtil {
   void AbortOrderByOrder(TransportOrder* order);
 
  private:
+  void AbortOrder(Vehicle* vehicle, TransportOrder* order);
+
+  ControllerPool* controller_pool_;
+  ReserveOrderPool* reserve_order_pool_;
+  MapService* map_service_;
+  TransportOrderService* transport_order_service_;
+  VehicleService* vehicle_service_;
+  IRouter* router_;
 };
 
 }  // namespace tcs

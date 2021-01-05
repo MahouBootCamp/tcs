@@ -14,6 +14,17 @@ struct MovementCommand {
   bool is_last_movement;
 };
 
+inline bool operator==(const MovementCommand &cmd1,
+                       const MovementCommand &cmd2) {
+  return cmd1.step == cmd2.step && cmd1.operation == cmd2.operation &&
+         cmd1.is_last_movement == cmd2.is_last_movement;
+}
+
+inline bool operator!=(const MovementCommand &cmd1,
+                       const MovementCommand &cmd2) {
+  return !(cmd1 == cmd2);
+}
+
 }  // namespace tcs
 
 #endif /* MOVEMENT_COMMAND_H */

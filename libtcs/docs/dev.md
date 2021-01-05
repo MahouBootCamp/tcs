@@ -2,36 +2,144 @@
 
 打草稿用。
 
-## 逻辑
+## TODOs
 
-TransportOrderState：
+- [ ] 梳理Dispatcher、Scheduler、VehicleController、VehicleAdapter相关业务逻辑
+  - [ ] 订单逻辑
+  - [ ] DriveOrder执行逻辑
+- [ ] 命名风格修改：成员函数一律大写
+- [ ] 完善Service设施
+- [ ] 搭建一个可用测试的Kernal
+- [ ] 对各组件的单元测试
+- [ ] 系统测试
+- [ ] 进一步开发：
+  - [ ] 低电量载具充电、空闲载具停泊逻辑。
 
-- kRaw：刚创建
-- kActive：通过Dispatcher检查，等待依赖订单完成
-- kDispatchable：无依赖订单，随时可以分配
-- kBeingProcessed：正在执行
-- kWithdraw：被撤回（人为或系统自动）
-- kFinished：完成
-- kFailed：失败
-- kUnRoutable：无法寻路
+## 订单执行逻辑梳理
 
-VehicleState：
+`Dispatcher`被设置为每间隔一段时间便运行一次（OpenTCS中默认设置为10s一次）。
 
-- kUnknown：未知
-- kUnavailable：不可用
-- kError：错误
-- kIdle：待机
-- kExecuting：运行中
-- kCharging：充电中
+### 正常普通订单流程
 
-ProcessState：
+#### Step1 创建
 
-- kIdle：待机
-- kAwaitingOrder：等待指令
-- kProcessingOrder：执行指令
+一个正常工作的普通订单由用户自行创建。在创建后该订单的`TransportOrderState`被设置为`kRaw`状态，并等待下一个`DispatchTask`的执行。（**TODO**：在更高层级处创建订单后应当主动调用Dispatcher的`Dispatch()`函数。）
 
-整个控制系统的工作都基于以上这几个状态构成的状态机。由于OpenTCS将一个完整的用户创建的订单称为TransportOrder，又将订单的步骤（到某点做某事为一个步骤）称为DriveOrder，而这两者又均简称为Order，因此在理解上造成了混乱。
+#### Step2 可寻路性检测
 
-`VehicleState`用于指示载具当前状态。这是一个由载具自行掌控的状态（Adapter负责）。系统的其他部分只读取以判断该载具是否可用。
+在`Phase0CheckNewOrder`中，系统调用Router检测所有`kRaw`状态的订单的可寻路性，如果不可则设置为`kUnroutable`，订单生命结束；可则设置为`kDispatchable`，等待后续处理。
 
-`ProcessState`用于指示载具执行DriveOrder的状态。Dispatcher在将一个DriveOrder推送给载具的Controller后，便将该状态设为kProcessingOrder。Controller会在DriveOrder执行结束后将该状态设为kAwaitingOrder。随后Dispatcher处若判断整个订单执行完毕，会将其设置为kIdle。
+#### Step3 分配
+
+在`Phase4AssignFreeOrder`中，系统检测所有设置为`kDispatchable`的订单，并为之分配载具。
+
+在这一步中，如果可用载具比订单少，则根据载具当前位置计算订单执行花费，优先执行低花费订单；否则根据订单计算每台载具执行该订单的花费，优先选择花费少的载具。
+
+如果当前无法执行，则跳过该订单。该订单将等待至下一次Phase4尝试分配。
+
+如果可以执行，则会将订单、载具配对，并尝试分配，进入Step4。
+
+#### Step4 分配第一步
+
+可用载具本身可能处于两个状态：空闲或正在执行可撤回订单。可撤回订单指的是系统分配的停泊订单，这些订单用于让空闲载具停泊至系统指定的停泊点，以避免拥挤在任务执行点位。
+
+如果载具正在执行可撤回订单，则在这一步中会撤回该系统订单。随后载具与订单会被加入ReserveOrderPool中等待执行。流程跳转至Step6。
+
+如果载具空闲，则为之分配订单，包括：
+
+- 从ReserveOrderPool中移除该订单（如果有的话）。
+- 更新载具状态为`kProcessingOrder`。
+- 更新订单状态为`kBeingProcessed`。
+- 更新载具正在执行的订单ID。
+- 更新订单的载具ID。
+- 更新订单的DriveOrders为Router找到的最优解，并将进度标记设置为0。
+- 在Router缓存载具与对应的DriveOrders。
+- 获取第一个DriveOrder并检查可否跳过。
+  - 可，则设置载具状态为`kAwaitingOrder`。
+  - 否，则通过VehicleController设定要执行的DriveOrder。
+
+随后载具等待下一步或开始执行当前DriveOrder直至完毕，这一部分将由VehicleController和Scheduler共同控制。之后进入Step5。
+
+#### Step5 分配下一步/结束订单
+
+在`Phase2AssignNextDriveOrder`中，Dispatcher为载具分配下一步动作。
+
+载具执行完毕或跳过了一个DriveOrder后，即会被设定为`kAwaitingOrder`。检测所有当前为该状态的载具，并更新这些载具所执行订单的进度标记加1。
+
+检测进度标记，如果该标记与路径数一致，则说明所有DriveOrders均执行完毕，即订单执行完毕。这时：
+
+- 更新订单状态为`kFinished`。
+- 更新载具状态为`kIdle`。
+- 更新载具执行订单为空。
+- 清除Router缓存。
+
+否则说明有下一DriveOrder。检查该DriveOrder是否可以跳过，可则直接重复Phase2。否则将该DriveOrder推送给VehicleController并更新载具状态为`kProcessingOrder`。
+
+#### Step6 预留订单
+
+在`Phase3AssignReservedOrder`中，Dispatcher为预留订单进行分配。
+
+对于空闲载具，系统检测是否有对应的预留订单。如果有则重新为其计算路径，并进入Step4。
+
+### 撤销订单流程
+
+如果订单尚未被分配至载具，则直接将其状态更新为`kFailed`。
+
+如果订单正在处理，则将其状态设置为`kWithdraw`。并调用VehicleController的`AbortDriveOrder`。这会停止控制器为载具进一步请求资源的行为，并取消除载具当前步骤（含一条路径和一个目标点）的所有资源请求。
+
+在下一次`Phase1FinishWithdrawal`中，对于状态为`kAwaitingOrder`的载具（即其完成了被取消的DriveOrder的残余指令），如果订单状态为`kWithdraw`，则撤销订单：
+
+- 订单状态更新为`kFailed`
+- 载具运行状态更新为`kIdle`
+- 载具订单更新为空
+- 清空Router缓存
+
+### 系统内部订单：充电/停车订单
+
+<!--UNDONE 这一部分逻辑需要进一步考虑-->
+
+## 资源管理/载具控制逻辑梳理
+
+VehicleController提供了控制载具的一系列接口，其依赖于一个用户实现的VehicleAdapter（预设了若干接口）来实现功能。它将DriveOrder分解为一个又一个MovementCommand并推送给VehicleAdapter。VehicleAdapter负责与载具进行实际通讯，并将系统指令转化为载具指令（故需要载具开发人员自行实现）。
+
+Scheduler集中进行系统资源管理。在执行一个MovementCommand前，VehicleController会首先向Scheduler请求资源并等待Scheduler调用它的`AllocationSuccessful()`接口（意味着资源已经被分配给它），随后它再将MovementCommand推送给VehicleAdapter。这时候载具便可以放心执行该指令而无需担心与其他载具的冲突。
+
+### 初始化
+
+VehicleController的构造函数会调用VehicleAdapter的`Enable()`函数以连接载具。在连接成功后，还需为载具配置初始位置。调用`SetInitPosition()`函数会向Scheduler请求初始位置的资源，并将初始位置推入请求资源栈。在这之后载具才可以将级别调整至`kUtilized`。
+
+### 执行DriveOrder逻辑
+
+#### Step1
+
+外部调用`SetDriveOrder()`为控制器指定要执行的DriveOrder。控制器会声明其将要申请的资源，设置载具状态，将执行步骤（这里指Step）设置为0，申请第一个Step的资源。
+
+#### Step2
+
+Scheduler通过了该资源申请后，会调用控制器的`AllocationSuccessful()`。这时控制器会比对刚分配的资源与自己请求资源是否一致。若不一致，返回失败。
+
+若一致，则检查是否有待执行的指令。如有则将刚才的资源推入请求资源栈，并将该指令推送给Adapter。随后如果Adapter可以接收更多指令缓存，则申请下一个Step的资源。
+
+> 请求资源与载具的行动未必保持一致。
+
+#### Step3
+
+Adapter在指令栈不为空时取出一个指令并执行。顺利执行的过程中，Adapter可能会激活`UpdatePositionEvent`、`FinishCommandEvent`事件。
+
+Controller处理`UpdatePositionEvent`时，设置载具的新位置。
+
+Controller处理`FinishCommandEvent`时，会将请求资源栈的首元素弹出并通知Scheduler释放。
+
+如果还有后续指令，则继续尝试`AllocateForNextCommand`。
+
+如果没有后续指令，则意味着整个DriveOrder结束，重置载具进度为0，载具执行状态为`kAwaitingOrder`。
+
+### 撤销DriveOrder逻辑
+
+
+
+### DriveOrder执行失败逻辑
+
+<!--UNDONE-->
+
+## 系统逻辑梳理

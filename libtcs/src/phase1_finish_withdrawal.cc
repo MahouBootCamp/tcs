@@ -26,25 +26,25 @@ void Phase1FinishWithdrawal::FinishWithDrawal(Vehicle* vehicle,
   router_->SelectRoute(vehicle, {});
 
   // If charge / park order, cancel reservation of charge point
-  if (order->get_drive_orders().back().get_destination().site ==
-      map_service_->GetChargeLocation()->get_id()) {
-    map_service_->GetChargeLocation()->ReleasePoint(order->get_drive_orders()
-                                                        .back()
-                                                        .get_route()
-                                                        ->get_steps()
-                                                        .back()
-                                                        .destination->get_id());
-  }
+  // if (order->get_drive_orders().back().get_destination().site ==
+  //     map_service_->GetChargeLocation()->get_id()) {
+  //   map_service_->GetChargeLocation()->ReleasePoint(order->get_drive_orders()
+  //                                                       .back()
+  //                                                       .get_route()
+  //                                                       ->get_steps()
+  //                                                       .back()
+  //                                                       .destination->get_id());
+  // }
 
-  if (order->get_drive_orders().back().get_destination().site ==
-      map_service_->GetParkLocation()->get_id()) {
-    map_service_->GetParkLocation()->ReleasePoint(order->get_drive_orders()
-                                                      .back()
-                                                      .get_route()
-                                                      ->get_steps()
-                                                      .back()
-                                                      .destination->get_id());
-  }
+  // if (order->get_drive_orders().back().get_destination().site ==
+  //     map_service_->GetParkLocation()->get_id()) {
+  //   map_service_->GetParkLocation()->ReleasePoint(order->get_drive_orders()
+  //                                                     .back()
+  //                                                     .get_route()
+  //                                                     ->get_steps()
+  //                                                     .back()
+  //                                                     .destination->get_id());
+  // }
 }
 
 }  // namespace tcs

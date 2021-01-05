@@ -10,9 +10,9 @@ SimVehicleAdapter::~SimVehicleAdapter() {
 void SimVehicleAdapter::Enable() {
   BOOST_LOG_TRIVIAL(debug) << "Enable SimVehicleAdapter";
   enabled_ = true;
-  UpdateVehicleStateEvent().Fire(VehicleState::kIdle);
   BOOST_LOG_TRIVIAL(debug) << "Simulation thread initializing";
   simulate_thread_ = std::thread(&SimVehicleAdapter::SimulateTasks, this);
+  UpdateVehicleStateEvent().Fire(VehicleState::kIdle);
 }
 
 void SimVehicleAdapter::Disable() {
@@ -41,6 +41,11 @@ void SimVehicleAdapter::ClearCommandQueue() {
   BOOST_LOG_TRIVIAL(debug) << "Clear command queue";
   std::scoped_lock<std::mutex> lk{mut_};
   command_queue_ = {};
+}
+
+bool SimVehicleAdapter::CanEnqueueCommand() {
+  std::scoped_lock<std::mutex> lk{mut_};
+  return command_queue_.size() < kMaxCommandQueueSize;
 }
 
 void SimVehicleAdapter::SimulateTasks() {

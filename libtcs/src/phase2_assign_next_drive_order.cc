@@ -25,26 +25,26 @@ void Phase2AssignNextDriveOrder::CheckForNextOrder(Vehicle* vehicle) {
                                                TransportOrderState::kFinished);
 
     // If charge / park order, cancel reservation of charge point
-    if (order->get_drive_orders().back().get_destination().site ==
-        map_service_->GetChargeLocation()->get_id()) {
-      map_service_->GetChargeLocation()->ReleasePoint(
-          order->get_drive_orders()
-              .back()
-              .get_route()
-              ->get_steps()
-              .back()
-              .destination->get_id());
-    }
+    // if (order->get_drive_orders().back().get_destination().site ==
+    //     map_service_->GetChargeLocation()->get_id()) {
+    //   map_service_->GetChargeLocation()->ReleasePoint(
+    //       order->get_drive_orders()
+    //           .back()
+    //           .get_route()
+    //           ->get_steps()
+    //           .back()
+    //           .destination->get_id());
+    // }
 
-    if (order->get_drive_orders().back().get_destination().site ==
-        map_service_->GetParkLocation()->get_id()) {
-      map_service_->GetParkLocation()->ReleasePoint(order->get_drive_orders()
-                                                        .back()
-                                                        .get_route()
-                                                        ->get_steps()
-                                                        .back()
-                                                        .destination->get_id());
-    }
+    // if (order->get_drive_orders().back().get_destination().site ==
+    //     map_service_->GetParkLocation()->get_id()) {
+    //   map_service_->GetParkLocation()->ReleasePoint(order->get_drive_orders()
+    //                                                     .back()
+    //                                                     .get_route()
+    //                                                     ->get_steps()
+    //                                                     .back()
+    //                                                     .destination->get_id());
+    // }
 
     // Update vehicle to kIdle. It would be dispatched in next phase
     vehicle_service_->UpdateVehicleProcessState(vehicle_id,

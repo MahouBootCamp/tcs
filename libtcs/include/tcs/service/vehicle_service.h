@@ -17,6 +17,8 @@ class VehicleService {
     return process_state_change_event_;
   }
 
+  Vehicle* GetVehicle(MapObjectID id) { return map_->get_vehicle(id); }
+
   std::unordered_set<Vehicle*> FilterVehiclesByState(VehicleState state);
   std::unordered_set<Vehicle*> FilterVehiclesByProcessState(ProcessState state);
   void UpdateVehicleState(MapObjectID vehicle_id, VehicleState state);

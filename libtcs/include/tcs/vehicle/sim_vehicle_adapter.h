@@ -9,7 +9,7 @@
 
 namespace tcs {
 
-const std::size_t kMaxCommandQueueSize = 10;
+const std::size_t kMaxCommandQueueSize = 2;
 const double kSimSpeed = 100;        // mm/s
 const long kSimOperation = 1;        // s
 const long kSimChargeOperation = 5;  // s
@@ -31,6 +31,8 @@ class SimVehicleAdapter : public IVehicleAdapter {
   bool EnqueueCommand(MovementCommand command) override;
 
   void ClearCommandQueue() override;
+
+  bool CanEnqueueCommand() override;
 
   // void InitPosition(MapObjectID point) override {
   //   UpdatePositionEvent().Fire(std::move(point));

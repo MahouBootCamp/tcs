@@ -24,6 +24,12 @@ enum class TransportOrderState {
   kUnRoutable
 };
 
+inline bool IsFinalState(TransportOrderState state) {
+  return state == TransportOrderState::kFinished ||
+         state == TransportOrderState::kFailed ||
+         state == TransportOrderState::kUnRoutable;
+}
+
 class TransportOrder {
  public:
   // TransportOrder(TransportOrderID id, std::vector<DriveOrder> drive_orders,

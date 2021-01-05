@@ -7,9 +7,25 @@ void DefaultDispatcher::Dispatch() {
   executor_->Submit(&DefaultDispatcher::DispatchTask, this);
 }
 
-void DefaultDispatcher::WithdrawOrder(TransportOrder* order, bool immediate) {}
+void DefaultDispatcher::WithdrawOrder(TransportOrder* order, bool immediate) {
+  if (!immediate) {
+    BOOST_LOG_TRIVIAL(debug) << "Scheduling withdraw task...";
+    executor_->Submit(&UniversalDispatchUtil::AbortOrderByOrder,
+                      universal_dispatch_util_.get(), order);
+  } else {
+    // UNDONE
+  }
+}
 
-void DefaultDispatcher::WithdrawOrder(Vehicle* order, bool immediate) {}
+void DefaultDispatcher::WithdrawOrder(Vehicle* vehicle, bool immediate) {
+  if (!immediate) {
+    BOOST_LOG_TRIVIAL(debug) << "Scheduling withdraw task...";
+    executor_->Submit(&UniversalDispatchUtil::AbortOrderByVehicle,
+                      universal_dispatch_util_.get(), vehicle);
+  } else {
+    // UNDONE
+  }
+}
 
 void DefaultDispatcher::DispatchTask() {
   phase0_.Run();

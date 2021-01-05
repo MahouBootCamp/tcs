@@ -28,22 +28,29 @@ void DefaultController::UpdatePositionEventHandler(MapObjectID point) {
 }
 
 void DefaultController::FinishCommandEventHandler(MovementCommand cmd) {
+  auto cmd_sent = std::move(command_sent_.front());
+  command_sent_.pop_front();
+  if (cmd_sent != cmd) {
+    throw std::runtime_error("Adapter executed unknown command");
+  }
+
   if (cmd.operation == kChargeOperation) {
     vehicle_->set_finish_charge(true);
     vehicle_->set_need_charge(false);
   }
+  vehicle_->set_route_progress_index(vehicle_->get_route_progress_index() + 1);
   auto resources = std::move(allocated_resources_.front());
   allocated_resources_.pop_front();
   scheduler_->Free(this, resources);
-  // Check if current drive order is finished
-  if (!pending_command_.has_value() && command_queue_.empty() &&
-      !waiting_for_allocation_) {
+  // Check if current drive order is finished：
+  // No command unsent and vehicle has finished final step.
+  if (HasFinishedOrAbortedDriveOrder()) {
     vehicle_->set_route_progress_index(0);
     vehicle_->set_process_state(
         ProcessState::kAwaitingOrder);  // The dispatcher would notice this
                                         // state change in next phase
     current_drive_order_.reset();
-  } else if (!waiting_for_allocation_) {
+  } else if (CanSendNextCommand()) {
     AllocateForNextCommand();
   }
 }
@@ -74,9 +81,10 @@ bool DefaultController::AllocationSuccessful(
   pending_command_.reset();
   pending_resources_.clear();
   allocated_resources_.push_back(resources);
+  command_sent_.push_back(cmd);
   adapter_->EnqueueCommand(std::move(cmd));
   waiting_for_allocation_ = false;
-  if (!waiting_for_allocation_) AllocateForNextCommand();
+  if (CanSendNextCommand()) AllocateForNextCommand();
   return true;
 }
 
@@ -94,7 +102,7 @@ void DefaultController::SetDriveOrder(DriveOrder order) {
   current_drive_order_ = order;
   vehicle_->set_route_progress_index(0);
   CreateFutureCommands(order);
-  if (!waiting_for_allocation_) {
+  if (CanSendNextCommand()) {
     AllocateForNextCommand();
   }
 }
@@ -127,6 +135,8 @@ void DefaultController::AbortDriveOrder(bool immediately) {
 void DefaultController::InitPosition(MapResource* point) {
   scheduler_->AllocateNow(this, {point});
   vehicle_->set_current_point(point->get_id());
+  // TODO: Set controller private status of this allocation
+  // UNDONE: MARK WHERE I STOPPED...
 }
 
 std::vector<std::unordered_set<MapResource*>>
@@ -140,7 +150,7 @@ DefaultController::ExpandDriveOrder(DriveOrder& order) {
 }
 
 void DefaultController::CreateFutureCommands(DriveOrder& order) {
-  // TODO: command_queue_.clear() ?
+  // REVIEW: command_queue_.clear() ?
 
   std::string operation = order.get_destination().operation;
   auto& steps = order.get_route()->get_steps();
