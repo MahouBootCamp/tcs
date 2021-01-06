@@ -24,6 +24,9 @@ class OrderPool {
   TransportOrderID AddOrder(
       std::vector<Destination> destinations,
       std::unordered_set<TransportOrderID> dependencies = {});
+  std::unordered_set<TransportOrder*> GetAllOrders();
+  std::unordered_set<TransportOrder*> GetOrdersByID(
+      std::unordered_set<TransportOrderID>& id_set);
 
  private:
   // mutable std::recursive_mutex mut_;

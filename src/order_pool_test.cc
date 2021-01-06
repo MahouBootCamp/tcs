@@ -47,6 +47,6 @@ TEST_F(OrderPoolTest, DefaultTest) {
   auto order0 = order_pool.AddOrder({{15, "Load"}, {16, "Unload"}});
   auto order0_ptr = order_pool.GetOrder(order0);
   ASSERT_TRUE(order0_ptr);
-  ASSERT_EQ(order0_ptr->get_drive_orders().size(), 2);
+  ASSERT_EQ(order0_ptr->GetDriveOrders().size(), 2);
   ASSERT_EQ(order0_ptr->GetDependencies().size(), 0);
 }

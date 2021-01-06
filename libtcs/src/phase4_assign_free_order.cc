@@ -34,7 +34,7 @@ void Phase4AssignFreeOrder::Run() {
 }
 
 std::unordered_set<Vehicle*> Phase4AssignFreeOrder::FilterAvailableVehicles() {
-  auto all_vehicles = map_service_->GetAllVehicles();
+  auto all_vehicles = vehicle_service_->GetAllVehicles();
   std::unordered_set<Vehicle*> result;
   for (auto& vehicle : all_vehicles) {
     bool process_no_order =
@@ -93,14 +93,14 @@ void Phase4AssignFreeOrder::AssignOrder(AssignmentCandidate& candidate) {
     transport_order_service_->UpdateOrderState(
         order_id, TransportOrderState::kBeingProcessed);
     vehicle_service_->UpdateVehicleTransportOrder(vehicle_id, order_id);
-    transport_order_service_->SetTransportOrderVehicleAndDriveOrder(
+    transport_order_service_->UpdateOrderVehicleAndDriveOrder(
         order_id, vehicle_id, std::move(candidate.drive_orders));
     router_->SelectRoute(candidate.vehicle,
-                         candidate.transport_order->get_drive_orders());
+                         candidate.transport_order->GetDriveOrders());
 
     // Check first drive order
     auto& first_drive_order =
-        candidate.transport_order->get_drive_orders().front();
+        candidate.transport_order->GetDriveOrders().front();
     if (CanBypassDriveOrder(first_drive_order, candidate.vehicle)) {
       vehicle_service_->UpdateVehicleProcessState(vehicle_id,
                                                   ProcessState::kAwaitingOrder);

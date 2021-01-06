@@ -47,7 +47,11 @@ class TransportOrder {
   }
 
   TransportOrderID GetID() { return id_; }
-  std::vector<DriveOrder>& get_drive_orders() { return drive_orders_; }
+
+  std::vector<DriveOrder>& GetDriveOrders() { return drive_orders_; }
+  void SetDriveOrders(std::vector<DriveOrder> drive_orders) {
+    drive_orders_ = drive_orders;
+  }
 
   std::vector<DriveOrder> GetFutureDriveOrders() {
     return std::vector<DriveOrder>(drive_orders_.begin() + progress_index_,
@@ -59,10 +63,13 @@ class TransportOrder {
   }
 
   std::size_t GetProgressIndex() { return progress_index_; }
+  void SetProgressIndex(std::size_t index) { progress_index_ = index; }
 
   TransportOrderState GetState() { return state_; }
+  void SetState(TransportOrderState state) { state_ = state; }
 
   MapObjectRef GetVehicle() { return vehicle_; }
+  void SetVehicle(MapObjectRef vehicle_ref) { vehicle_ = vehicle_ref; }
 
   bool GetDispensable() { return dispensable_; }
 

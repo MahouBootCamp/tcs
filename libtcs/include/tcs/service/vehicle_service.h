@@ -9,6 +9,8 @@ namespace tcs {
 
 class VehicleService {
  public:
+  VehicleService(Map* map) : map_{map} {}
+
   Event<VehicleState, VehicleState>& VehicleStateChangeEvent() {
     return vehicle_state_change_event_;
   }
@@ -16,15 +18,6 @@ class VehicleService {
   Event<ProcessState, ProcessState>& ProcessStateChangeEvent() {
     return process_state_change_event_;
   }
-
-  Vehicle* GetVehicle(MapObjectID id) { return map_->GetVehicle(id); }
-
-  std::unordered_set<Vehicle*> FilterVehiclesByState(VehicleState state);
-  std::unordered_set<Vehicle*> FilterVehiclesByProcessState(ProcessState state);
-  void UpdateVehicleState(MapObjectID vehicle_id, VehicleState state);
-  void UpdateVehicleProcessState(MapObjectID vehicle_id, ProcessState state);
-  void UpdateVehicleTransportOrder(MapObjectID vehicle_id,
-                                   TransportOrderRef order_ref);
 
   template <class Predicate>
   std::unordered_set<Vehicle*> FilterBy(Predicate p) {
@@ -35,6 +28,40 @@ class VehicleService {
     }
     return result;
   }
+
+  Vehicle* GetVehicle(MapObjectID id) { return map_->GetVehicle(id); }
+
+  std::unordered_set<Vehicle*> GetAllVehicles() {
+    return map_->GetAllVehicles();
+  }
+
+  std::unordered_set<Vehicle*> FilterVehiclesByState(VehicleState state) {
+    return FilterBy(
+        [&state](Vehicle* v) { return v->GetVehicleState() == state; });
+  }
+
+  std::unordered_set<Vehicle*> FilterVehiclesByProcessState(
+      ProcessState state) {
+    return FilterBy(
+        [&state](Vehicle* v) { return v->GetProcessState() == state; });
+  }
+
+  void UpdateVehicleState(MapObjectID vehicle_id, VehicleState state);
+
+  void UpdateVehicleProcessState(MapObjectID vehicle_id, ProcessState state);
+
+  void UpdateVehicleTransportOrder(MapObjectID vehicle_id,
+                                   TransportOrderRef order_ref);
+
+  void UpdateVehicleCurrentPosition(MapObjectID vehicle_id,
+                                    MapObjectRef point_ref);
+
+  void UpdateVehicleRouteProgressIndex(MapObjectID vehicle_id,
+                                       std::size_t index);
+
+  void UpdateVehicleNeedCharge(MapObjectID vehicle_id, bool need_charge);
+
+  void UpdateVehicleFinishCharge(MapObjectID vehicle_id, bool finish_charge);
 
  private:
   Map* map_;

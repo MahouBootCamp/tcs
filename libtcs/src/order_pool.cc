@@ -35,4 +35,21 @@ TransportOrderID OrderPool::AddOrder(
   return tmp;
 }
 
+std::unordered_set<TransportOrder*> OrderPool::GetAllOrders() {
+  std::unordered_set<TransportOrder*> result;
+  for (auto& pair : order_pool_) {
+    result.insert(pair.second.get());
+  }
+  return result;
+}
+
+std::unordered_set<TransportOrder*> OrderPool::GetOrdersByID(
+    std::unordered_set<TransportOrderID>& id_set) {
+  std::unordered_set<TransportOrder*> result;
+  for (auto& id : id_set) {
+    result.insert(GetOrder(id));
+  }
+  return result;
+}
+
 }  // namespace tcs

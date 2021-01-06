@@ -26,9 +26,9 @@ void Phase1FinishWithdrawal::FinishWithDrawal(Vehicle* vehicle,
   router_->SelectRoute(vehicle, {});
 
   // If charge / park order, cancel reservation of charge point
-  // if (order->get_drive_orders().back().GetDestination().site ==
+  // if (order->GetDriveOrders().back().GetDestination().site ==
   //     map_service_->GetChargeLocation()->GetID()) {
-  //   map_service_->GetChargeLocation()->ReleasePoint(order->get_drive_orders()
+  //   map_service_->GetChargeLocation()->ReleasePoint(order->GetDriveOrders()
   //                                                       .back()
   //                                                       .GetRoute()
   //                                                       ->GetSteps()
@@ -36,9 +36,9 @@ void Phase1FinishWithdrawal::FinishWithDrawal(Vehicle* vehicle,
   //                                                       .destination->GetID());
   // }
 
-  // if (order->get_drive_orders().back().GetDestination().site ==
+  // if (order->GetDriveOrders().back().GetDestination().site ==
   //     map_service_->GetParkLocation()->GetID()) {
-  //   map_service_->GetParkLocation()->ReleasePoint(order->get_drive_orders()
+  //   map_service_->GetParkLocation()->ReleasePoint(order->GetDriveOrders()
   //                                                     .back()
   //                                                     .GetRoute()
   //                                                     ->GetSteps()

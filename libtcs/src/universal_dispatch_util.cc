@@ -36,12 +36,12 @@ void UniversalDispatchUtil::AssignOrder(
     transport_order_service_->UpdateOrderState(
         order_id, TransportOrderState::kBeingProcessed);
     vehicle_service_->UpdateVehicleTransportOrder(vehicle_id, order_id);
-    transport_order_service_->SetTransportOrderVehicleAndDriveOrder(
+    transport_order_service_->UpdateOrderVehicleAndDriveOrder(
         order_id, vehicle_id, std::move(drive_orders));
-    router_->SelectRoute(vehicle, order->get_drive_orders());
+    router_->SelectRoute(vehicle, order->GetDriveOrders());
 
     // Check first drive order
-    auto &first_drive_order = order->get_drive_orders().front();
+    auto &first_drive_order = order->GetDriveOrders().front();
     if (CanBypassDriveOrder(first_drive_order, vehicle)) {
       vehicle_service_->UpdateVehicleProcessState(vehicle_id,
                                                   ProcessState::kAwaitingOrder);

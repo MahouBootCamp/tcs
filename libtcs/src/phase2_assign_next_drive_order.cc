@@ -14,21 +14,23 @@ void Phase2AssignNextDriveOrder::Run() {
 void Phase2AssignNextDriveOrder::CheckForNextOrder(Vehicle* vehicle) {
   auto vehicle_id = vehicle->GetID();
   auto order_id = vehicle->GetTransportOrder().value();
-  transport_order_service_->SetTransportOrderNextDriveOrder(order_id);
+  transport_order_service_->UpdateOrderNextDriveOrder(order_id);
   auto order = transport_order_service_->GetTransportOrder(order_id);
   // Check if transport order is finished
-  if (order->GetProgressIndex() == order->get_drive_orders().size()) {
+  if (order->GetProgressIndex() == order->GetDriveOrders().size()) {
     BOOST_LOG_TRIVIAL(info)
         << "Vehicle " << vehicle_id << " finished transport order " << order_id;
     // Update order to kFinished
     transport_order_service_->UpdateOrderState(order_id,
                                                TransportOrderState::kFinished);
 
+    SetOrderFinished(vehicle, order);
+
     // If charge / park order, cancel reservation of charge point
-    // if (order->get_drive_orders().back().GetDestination().site ==
+    // if (order->GetDriveOrders().back().GetDestination().site ==
     //     map_service_->GetChargeLocation()->GetID()) {
     //   map_service_->GetChargeLocation()->ReleasePoint(
-    //       order->get_drive_orders()
+    //       order->GetDriveOrders()
     //           .back()
     //           .GetRoute()
     //           ->GetSteps()
@@ -36,29 +38,19 @@ void Phase2AssignNextDriveOrder::CheckForNextOrder(Vehicle* vehicle) {
     //           .destination->GetID());
     // }
 
-    // if (order->get_drive_orders().back().GetDestination().site ==
+    // if (order->GetDriveOrders().back().GetDestination().site ==
     //     map_service_->GetParkLocation()->GetID()) {
-    //   map_service_->GetParkLocation()->ReleasePoint(order->get_drive_orders()
+    //   map_service_->GetParkLocation()->ReleasePoint(order->GetDriveOrders()
     //                                                     .back()
     //                                                     .GetRoute()
     //                                                     ->GetSteps()
     //                                                     .back()
     //                                                     .destination->GetID());
     // }
-
-    // Update vehicle to kIdle. It would be dispatched in next phase
-    vehicle_service_->UpdateVehicleProcessState(vehicle_id,
-                                                ProcessState::kIdle);
-    vehicle_service_->UpdateVehicleTransportOrder(vehicle_id, std::nullopt);
-    router_->SelectRoute(vehicle, {});
-    // Check orders dependent on this order if all dependencies finished. Set
-    // them Dispatchable if true.
-    transport_order_service_->UpdateOrderWithDependencyFinished(order_id);
   } else {
     BOOST_LOG_TRIVIAL(info)
         << "Assigning next drive order to vehicle " << vehicle_id;
-    auto& drive_order =
-        order->get_drive_orders().at(order->GetProgressIndex());
+    auto& drive_order = order->GetDriveOrders().at(order->GetProgressIndex());
 
     // Check if the drive_order can bypass :no need to move and no special
     // operation
@@ -73,6 +65,32 @@ void Phase2AssignNextDriveOrder::CheckForNextOrder(Vehicle* vehicle) {
       vehicle_service_->UpdateVehicleProcessState(
           vehicle_id, ProcessState::kProcessingOrder);
     }
+  }
+}
+
+void Phase2AssignNextDriveOrder::SetOrderFinished(Vehicle* vehicle,
+                                                  TransportOrder* order) {
+  auto vehicle_id = vehicle->GetID();
+  auto order_id = order->GetID();
+
+  transport_order_service_->UpdateOrderState(order_id,
+                                             TransportOrderState::kFinished);
+  vehicle_service_->UpdateVehicleProcessState(vehicle_id, ProcessState::kIdle);
+  vehicle_service_->UpdateVehicleTransportOrder(vehicle_id, std::nullopt);
+  router_->SelectRoute(vehicle, {});
+
+  // Recheck TransportOrders dispathcable or not
+  auto related_orders =
+      transport_order_service_->FilterBy([&order_id](TransportOrder* order) {
+        return order->GetDependencies().find(order_id) ==
+               order->GetDependencies().end();
+      });
+
+  for (auto& related_order : related_orders) {
+    if (!transport_order_service_->HasUnfinishedDependencies(
+            related_order->GetID()))
+      transport_order_service_->UpdateOrderState(
+          related_order->GetID(), TransportOrderState::kDispatchable);
   }
 }
 

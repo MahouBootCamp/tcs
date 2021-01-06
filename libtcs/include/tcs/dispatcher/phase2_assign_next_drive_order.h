@@ -8,8 +8,8 @@ namespace tcs {
 class Phase2AssignNextDriveOrder : public Phase {
  public:
   // Phase2AssignNextDriveOrder(TransportOrderService* transport_order_service,
-  //                            VehicleService* vehicle_service, IRouter* router,
-  //                            ControllerPool* controller_pool)
+  //                            VehicleService* vehicle_service, IRouter*
+  //                            router, ControllerPool* controller_pool)
   //     : transport_order_service_{transport_order_service},
   //       vehicle_service_{vehicle_service},
   //       router_{router},
@@ -18,11 +18,14 @@ class Phase2AssignNextDriveOrder : public Phase {
 
  private:
   void CheckForNextOrder(Vehicle* vehicle);
+
   bool CanBypassDriveOrder(DriveOrder& drive_order, Vehicle* vehicle) {
     return drive_order.GetRoute()->GetSteps().back().destination->GetID() ==
                vehicle->GetCurrentPoint().value() &&
            drive_order.GetDestination().operation == kNoOperation;
   }
+
+  void SetOrderFinished(Vehicle* vehicle, TransportOrder* order);
 
   TransportOrderService* transport_order_service_;
   VehicleService* vehicle_service_;
