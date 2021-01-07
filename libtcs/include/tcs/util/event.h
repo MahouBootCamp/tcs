@@ -30,12 +30,12 @@ class Event {
     handlers_.erase(itr);
   }
 
-  void Fire(Args&&... args) {
+  void Fire(Args... args) {
     std::scoped_lock<std::mutex> lk{mut_};
     for (auto& handler : handlers_) {
       futures_.push_back(
-          std::async(std::launch::async, handler, std::forward<Args>(args)...));
-      // futures_.push_back(std::async(std::launch::async, std::ref(handler),
+          std::async(std::launch::async, handler, args...));
+      // futures_.push_back(std::async(std::launch::async, handler,
       //                               std::forward<Args>(args)...));
     }
     CheckStatus();

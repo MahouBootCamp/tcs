@@ -11,12 +11,16 @@ class VehicleService {
  public:
   VehicleService(Map* map) : map_{map} {}
 
-  Event<VehicleState, VehicleState>& VehicleStateChangeEvent() {
-    return vehicle_state_change_event_;
+  // Event<VehicleState, VehicleState>& VehicleStateChangeEvent() {
+  //   return vehicle_state_change_event_;
+  // }
+
+  Event<Vehicle*, ProcessState, ProcessState>& VehicleProcessStateChangeEvent() {
+    return process_state_change_event_;
   }
 
-  Event<ProcessState, ProcessState>& ProcessStateChangeEvent() {
-    return process_state_change_event_;
+  Event<Vehicle*>& VehicleNeedChangeEvent() {
+    return vehicle_need_change_event_;
   }
 
   template <class Predicate>
@@ -65,8 +69,9 @@ class VehicleService {
 
  private:
   Map* map_;
-  Event<VehicleState, VehicleState> vehicle_state_change_event_;
-  Event<ProcessState, ProcessState> process_state_change_event_;
+  // Event<VehicleState, VehicleState> vehicle_state_change_event_;
+  Event<Vehicle*, ProcessState, ProcessState> process_state_change_event_;
+  Event<Vehicle*> vehicle_need_change_event_;
 };
 
 }  // namespace tcs

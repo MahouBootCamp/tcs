@@ -37,4 +37,22 @@ void DefaultDispatcher::DispatchTask() {
   phase6_.Run();
 }
 
+void DefaultDispatcher::DispatchPeriodically() {}
+
+void DefaultDispatcher::VehicleProcessStateChangeEventHandler(
+    Vehicle* vehicle, ProcessState old_state, ProcessState new_state) {
+  if (vehicle->GetIntegrationLevel() == IntegrationLevel::kUtilized) {
+    if (old_state != new_state && (new_state == ProcessState::kAwaitingOrder ||
+                                   new_state == ProcessState::kIdle))
+      Dispatch();
+  }
+}
+
+void DefaultDispatcher::VehicleNeedChargeEventHandler(Vehicle* vehicle) {
+  if (vehicle->GetIntegrationLevel() == IntegrationLevel::kUtilized &&
+      vehicle->GetNeedCharge()) {
+    Dispatch();
+  }
+}
+
 }  // namespace tcs

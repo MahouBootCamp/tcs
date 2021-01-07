@@ -33,13 +33,29 @@ class DefaultDispatcher : public IDispatcher {
       : map_service_{map_service},
         router_{router},
         executor_(executor),
-        controller_pool_{controller_pool} {}
+        controller_pool_{controller_pool} {
+    vehicle_service_->VehicleProcessStateChangeEvent().Subscribe(std::bind(
+        &DefaultDispatcher::VehicleProcessStateChangeEventHandler, this,
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    vehicle_service_->VehicleNeedChangeEvent().Subscribe(
+        std::bind(&DefaultDispatcher::VehicleNeedChargeEventHandler, this,
+                  std::placeholders::_1));
+  }
+
   void Dispatch() override;
   void WithdrawOrder(TransportOrder* order, bool immediate) override;
   void WithdrawOrder(Vehicle* vehicle, bool immediate) override;
 
  private:
   void DispatchTask();
+
+  void DispatchPeriodically();
+
+  void VehicleProcessStateChangeEventHandler(Vehicle* vehicle,
+                                             ProcessState old_state,
+                                             ProcessState new_state);
+
+  void VehicleNeedChargeEventHandler(Vehicle* vehicle);
 
   MapService* map_service_;
   IRouter* router_;
