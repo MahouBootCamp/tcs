@@ -21,4 +21,20 @@ void TransportOrderService::UpdateOrderState(TransportOrderID order_id,
   order_state_change_event_.Fire(std::move(old_state), std::move(state));
 }
 
+void TransportOrderService::UpdateOrderNextDriveOrder(TransportOrderID id) {
+  auto order = GetTransportOrder(id);
+  order->SetProgressIndex(order->GetProgressIndex() + 1);
+}
+
+void TransportOrderService::UpdateOrderVehicleAndDriveOrder(
+    TransportOrderID id, MapObjectRef vehicle_ref,
+    std::optional<std::vector<DriveOrder> > drive_orders) {
+  auto order = GetTransportOrder(id);
+  order->SetVehicle(vehicle_ref);
+  if (drive_orders.has_value()) {
+    order->SetDriveOrders(std::move(drive_orders.value()));
+  } else  // Actually would not happen
+    order->SetDriveOrders({});
+}
+
 }  // namespace tcs

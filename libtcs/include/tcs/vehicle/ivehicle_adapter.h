@@ -23,7 +23,7 @@ class IVehicleAdapter {
   // virtual void InitPosition(MapObjectID point) = 0;
   virtual ~IVehicleAdapter() {}
 
-  Event<MapObjectID>& UpdatePositionEvent() { return update_position_event_; }
+  Event<MapObjectRef>& UpdatePositionEvent() { return update_position_event_; }
   Event<MovementCommand>& FinishCommandEvent() { return finish_command_event_; }
   Event<MovementCommand>& FailCommandEvent() { return fail_command_event_; }
   Event<>& RequestChargeEvent() { return request_charge_event_; }
@@ -32,7 +32,7 @@ class IVehicleAdapter {
   }
 
  private:
-  Event<MapObjectID> update_position_event_;
+  Event<MapObjectRef> update_position_event_;
   Event<MovementCommand> finish_command_event_;
   Event<MovementCommand> fail_command_event_;
   Event<> request_charge_event_;

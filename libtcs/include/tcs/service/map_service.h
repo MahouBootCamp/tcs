@@ -52,8 +52,8 @@ class MapService {
   //   return map_->GetAllVehicles();
   // }
 
-  // SpecialLocation* GetChargeLocation() { return map_->GetChargeLocation(); }
-  // SpecialLocation* GetParkLocation() { return map_->GetParkLocation(); }
+  SpecialLocation* GetChargeLocation() { return map_->GetChargeLocation(); }
+  SpecialLocation* GetParkLocation() { return map_->GetParkLocation(); }
 
   void UpdatePointProcessingVehicle(MapObjectID point_id, MapObjectRef vehicle_ref);
 

@@ -32,6 +32,7 @@ class ControllerPool {
  private:
   Map* map_;
   IScheduler* scheduler_;
+  VehicleService* vehicle_service_;
   std::unordered_map<MapObjectID, std::unique_ptr<IVehicleController>>
       controller_pool_;
 };

@@ -42,7 +42,7 @@ class TransportOrderService {
 
   void UpdateOrderState(TransportOrderID order_id, TransportOrderState state);
 
-  void UpdateOrderWithDependencyFinished(TransportOrderID finished_id);
+  // void UpdateOrderWithDependencyFinished(TransportOrderID finished_id);
 
   void UpdateOrderNextDriveOrder(TransportOrderID id);
 

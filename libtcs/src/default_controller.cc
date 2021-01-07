@@ -3,8 +3,12 @@
 namespace tcs {
 
 DefaultController::DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
-                                     IScheduler* scheduler)
-    : vehicle_{vehicle}, adapter_{adapter}, scheduler_{scheduler} {
+                                     IScheduler* scheduler,
+                                     VehicleService* vehicle_service)
+    : vehicle_{vehicle},
+      adapter_{adapter},
+      scheduler_{scheduler},
+      vehicle_service_{vehicle_service} {
   adapter_->FinishCommandEvent().Subscribe(
       std::bind(&DefaultController::FinishCommandEventHandler, this,
                 std::placeholders::_1));
@@ -23,8 +27,8 @@ DefaultController::DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
   adapter_->Enable();
 }
 
-void DefaultController::UpdatePositionEventHandler(MapObjectID point) {
-  vehicle_->SetCurrentPoint(point);
+void DefaultController::UpdatePositionEventHandler(MapObjectRef point_ref) {
+  vehicle_service_->UpdateVehicleCurrentPosition(vehicle_->GetID(), point_ref);
 }
 
 void DefaultController::FinishCommandEventHandler(MovementCommand cmd) {
@@ -34,19 +38,23 @@ void DefaultController::FinishCommandEventHandler(MovementCommand cmd) {
     throw std::runtime_error("Adapter executed unknown command");
   }
 
+  auto vehicle_id = vehicle_->GetID();
   if (cmd.operation == kChargeOperation) {
-    vehicle_->SetFinishCharge(true);
-    vehicle_->SetNeedCharge(false);
+    vehicle_service_->UpdateVehicleNeedCharge(vehicle_id, false);
+    vehicle_service_->UpdateVehicleFinishCharge(vehicle_id, true);
   }
-  vehicle_->SetRouteProgressIndex(vehicle_->GetRouteProgressIndex() + 1);
+
+  vehicle_service_->UpdateVehicleRouteProgressIndex(
+      vehicle_id, vehicle_->GetRouteProgressIndex() + 1);
   auto resources = std::move(allocated_resources_.front());
   allocated_resources_.pop_front();
   scheduler_->Free(this, resources);
   // Check if current drive order is finished：
   // No command unsent and vehicle has finished final step.
   if (HasFinishedOrAbortedDriveOrder()) {
-    vehicle_->SetRouteProgressIndex(0);
-    vehicle_->SetProcessState(
+    vehicle_service_->UpdateVehicleRouteProgressIndex(vehicle_id, 0);
+    vehicle_service_->UpdateVehicleProcessState(
+        vehicle_id,
         ProcessState::kAwaitingOrder);  // The dispatcher would notice this
                                         // state change in next phase
     current_drive_order_.reset();
@@ -60,11 +68,11 @@ void DefaultController::FailCommandEventHandler(MovementCommand cmd) {
 }
 
 void DefaultController::RequestChargeEventHandler() {
-  vehicle_->SetNeedCharge(true);
+  vehicle_service_->UpdateVehicleNeedCharge(vehicle_->GetID(), true);
 }
 
 void DefaultController::UpdateVehicleStateEventHandler(VehicleState state) {
-  vehicle_->SetVehicleState(state);
+  vehicle_service_->UpdateVehicleState(vehicle_->GetID(), state);
 }
 
 bool DefaultController::AllocationSuccessful(
@@ -100,7 +108,7 @@ void DefaultController::SetDriveOrder(DriveOrder order) {
                            << " setting driveorder";
   scheduler_->Claim(this, ExpandDriveOrder(order));
   current_drive_order_ = order;
-  vehicle_->SetRouteProgressIndex(0);
+  vehicle_service_->UpdateVehicleRouteProgressIndex(vehicle_->GetID(), 0);
   CreateFutureCommands(order);
   if (CanSendNextCommand()) {
     AllocateForNextCommand();
@@ -112,7 +120,7 @@ void DefaultController::AbortDriveOrder(bool immediately) {
     current_drive_order_.reset();
     waiting_for_allocation_ = false;
     pending_resources_.clear();
-    vehicle_->SetRouteProgressIndex(0);
+    vehicle_service_->UpdateVehicleRouteProgressIndex(vehicle_->GetID(), 0);
 
     adapter_->ClearCommandQueue();
     command_queue_.clear();
@@ -134,9 +142,11 @@ void DefaultController::AbortDriveOrder(bool immediately) {
 
 void DefaultController::InitPosition(MapResource* point) {
   scheduler_->AllocateNow(this, {point});
-  vehicle_->SetCurrentPoint(point->GetID());
+  vehicle_service_->UpdateVehicleCurrentPosition(vehicle_->GetID(),
+                                                 point->GetID());
   // TODO: Set controller private status of this allocation
   // UNDONE: MARK WHERE I STOPPED...
+  allocated_resources_.push_back({point});
 }
 
 std::vector<std::unordered_set<MapResource*>>

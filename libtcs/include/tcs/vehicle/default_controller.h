@@ -9,6 +9,7 @@
 
 #include "tcs/data/vehicle.h"
 #include "tcs/scheduler/ischeduler.h"
+#include "tcs/service/vehicle_service.h"
 #include "tcs/vehicle/ivehicle_controller.h"
 #include "tcs/vehicle/movement_command.h"
 
@@ -18,11 +19,11 @@ namespace tcs {
 class DefaultController : public IVehicleController {
  public:
   DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
-                    IScheduler* scheduler);
+                    IScheduler* scheduler, VehicleService* vehicle_service);
 
   MapObjectID GetVehicleID() override { return vehicle_->GetID(); }
 
-  void UpdatePositionEventHandler(MapObjectID point);
+  void UpdatePositionEventHandler(MapObjectRef point_ref);
 
   void FinishCommandEventHandler(MovementCommand cmd);
 
@@ -86,6 +87,7 @@ class DefaultController : public IVehicleController {
   Vehicle* vehicle_;
   std::unique_ptr<IVehicleAdapter> adapter_;
   IScheduler* scheduler_;
+  VehicleService* vehicle_service_;
   std::optional<DriveOrder> current_drive_order_ = std::nullopt;
   std::list<MovementCommand> command_queue_;
   std::list<MovementCommand> command_sent_;
