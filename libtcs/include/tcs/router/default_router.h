@@ -6,6 +6,7 @@
 
 #include "tcs/router/irouter.h"
 #include "tcs/router/shortest_path_algorithm.h"
+#include "tcs/service/map_service.h"
 #include "tcs/util/map.h"
 
 namespace tcs {
@@ -13,10 +14,12 @@ namespace tcs {
 class DefaultRouter : public IRouter {
  public:
   // REVIEW: Use map service instead of map pointer?
-  DefaultRouter(Map *map);
+  DefaultRouter(MapService *map_service)
+      : map_service_{map_service}, algo_{map_service_->GetMap()} {}
+
   bool ChechRoutability(TransportOrder *order) override;
-  std::optional<std::vector<DriveOrder>> GetRoute(Point *start_point,
-                                   TransportOrder *order) override;
+  std::optional<std::vector<DriveOrder>> GetRoute(
+      Point *start_point, TransportOrder *order) override;
   std::optional<Route> GetRoute(Point *start_point,
                                 Point *destination_point) override;
   double GetCost(Point *start_point, Point *destination_point) override;
@@ -48,8 +51,8 @@ class DefaultRouter : public IRouter {
 
   // Protect cached routes
   mutable std::mutex mut_;
-  // REVIEW: Get rid of direct access of map after initialization?
-  Map *map_;
+
+  MapService *map_service_;
   std::unordered_map<Vehicle *, std::vector<DriveOrder>> selected_routes_;
   ShortestPathAlgorithm algo_;
 };

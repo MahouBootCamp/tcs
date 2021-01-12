@@ -15,7 +15,7 @@
   - [x] Dispatcher触发机制
 - [ ] 搭建一个可用测试的Kernal
   - [ ] 添加一个周期性的Dispatch任务
-  - [ ] 各组件的构造函数整理
+  - [x] 各组件的构造函数整理
   - [ ] Kernal功能完善
 - [ ] 对各组件的单元测试
 - [ ] 多线程约束
@@ -114,7 +114,7 @@ VehicleController提供了控制载具的一系列接口，其依赖于一个用
 
 Scheduler集中进行系统资源管理。在执行一个MovementCommand前，VehicleController会首先向Scheduler请求资源并等待Scheduler调用它的`AllocationSuccessful()`接口（意味着资源已经被分配给它），随后它再将MovementCommand推送给VehicleAdapter。这时候载具便可以放心执行该指令而无需担心与其他载具的冲突。
 
-### 初始化
+### 载具初始化
 
 VehicleController的构造函数会调用VehicleAdapter的`Enable()`函数以连接载具。在连接成功后，还需为载具配置初始位置。调用`SetInitPosition()`函数会向Scheduler请求初始位置的资源，并将初始位置推入请求资源栈。在这之后载具才可以将级别调整至`kUtilized`。
 
@@ -151,3 +151,29 @@ Controller处理`FinishCommandEvent`时，会将请求资源栈的首元素弹�
 <!--UNDONE-->
 
 ## 系统逻辑梳理
+
+### 依赖关系与初始化
+
+这部分梳理内部组件之间复杂的逻辑关系。
+
+1. 最基础的组件显然是由MapBuilder构造的Map。这部分被独立在Kernal之外构造，并作为构造函数参数传入Kernal。
+2. 随后是OrderPool，仅依赖于Map。
+3. Executor是一个独立组件，不依赖于任何东西。
+4. 基于这两个基础组件，有三个Service用于控制对这两个基础组件的读写。多线程控制尚未加入。
+5. Router依赖于MapService。
+   1. Router的内部组件ShortestPathAlgorithm需要Map进行初始化。
+6. Scheduler依赖于MapService与Executor。
+   1. Scheduler有一个内部组件ReservationPool，无依赖。
+7. ControllerPool依赖于Map、VehicleService、Scheduler。（因为DefaultController依赖于这些组件，尽管DefaultController要到用户调用Kernal方法时才创建。）
+8. Dispatcher直接依赖于除Scheduler以外的所有组件（也间接依赖于Scheduler）。
+   1. ReserveOrderPool为Dispatcher一独立内部组件。
+   2. UniversalDispatchUtil与Dispatcher依赖相同。
+   3. 各Phase的依赖均为Dispatcher依赖的子集
+
+各组件的初始化也应当按照上述的顺序进行。
+
+### `KernalState::kIdle`
+
+### `KernalState::kOperating`
+
+### `KernalState::kExit`

@@ -2,8 +2,6 @@
 
 namespace tcs {
 
-DefaultRouter::DefaultRouter(Map *map) : map_{map}, algo_{map} {}
-
 bool DefaultRouter::ChechRoutability(TransportOrder *order) {
   auto future_orders = order->GetFutureDriveOrders();
   if (future_orders.size() <= 1) return true;
@@ -55,14 +53,16 @@ std::unordered_set<Point *> DefaultRouter::GetTargetedPoints() {
 std::unordered_set<Point *> DefaultRouter::ExpandDestination(
     DriveOrder &drive_order) {
   auto dst_id = drive_order.GetDestination().site;
-  auto location = map_->GetLocation(dst_id);
+  auto location = map_service_->GetLocation(dst_id);
   if (location) {
-    std::unordered_set<Point *> res;
-    for (auto &point_id : location->GetLinkedPoints())
-      res.insert(map_->GetPoint(point_id));
-    return res;
+    auto resources =
+        map_service_->GetResourcesByID(location->GetLinkedPoints());
+    std::unordered_set<Point *> result;
+    for (auto &resource : resources)
+      result.insert(static_cast<Point *>(resource));
+    return result;
   } else
-    return {map_->GetPoint(dst_id)};
+    return {map_service_->GetPoint(dst_id)};
 }
 
 bool DefaultRouter::CheckRoutability(std::vector<DriveOrder> &drive_orders,

@@ -7,13 +7,15 @@ namespace tcs {
 
 class Phase2AssignNextDriveOrder : public Phase {
  public:
-  // Phase2AssignNextDriveOrder(TransportOrderService* transport_order_service,
-  //                            VehicleService* vehicle_service, IRouter*
-  //                            router, ControllerPool* controller_pool)
-  //     : transport_order_service_{transport_order_service},
-  //       vehicle_service_{vehicle_service},
-  //       router_{router},
-  //       controller_pool_{controller_pool} {}
+  Phase2AssignNextDriveOrder(MapService* map_service,
+                             VehicleService* vehicle_service,
+                             TransportOrderService* transport_order_service,
+                             IRouter* router, ControllerPool* controller_pool)
+      : map_service_{map_service},
+        vehicle_service_{vehicle_service},
+        transport_order_service_{transport_order_service},
+        router_{router},
+        controller_pool_{controller_pool} {}
   void Run() override;
 
  private:
@@ -27,11 +29,11 @@ class Phase2AssignNextDriveOrder : public Phase {
 
   void SetOrderFinished(Vehicle* vehicle, TransportOrder* order);
 
-  TransportOrderService* transport_order_service_;
+  MapService* map_service_;
   VehicleService* vehicle_service_;
+  TransportOrderService* transport_order_service_;
   IRouter* router_;
   ControllerPool* controller_pool_;
-  MapService* map_service_;
 };
 
 }  // namespace tcs

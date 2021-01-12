@@ -15,8 +15,9 @@ namespace tcs {
 // Controller Pool stores a map of vehicles to controllers
 class ControllerPool {
  public:
-  ControllerPool(Map* map, IScheduler* scheduler)
-      : map_{map}, scheduler_{scheduler} {}
+  ControllerPool(Map* map, VehicleService* vehicle_service,
+                 IScheduler* scheduler)
+      : map_{map}, vehicle_service_{vehicle_service}, scheduler_{scheduler} {}
 
   // Controller would take the management of adapter's lifecycle.
   // If adapter is null, system would generate a simulate adapter.
@@ -30,9 +31,10 @@ class ControllerPool {
   IVehicleController* GetController(MapObjectID vehicle);
 
  private:
-  Map* map_;
-  IScheduler* scheduler_;
+  Map* map_;  // We do not need a MapService here since change in controller
+              // pool would only happen in Kernal Idle state.
   VehicleService* vehicle_service_;
+  IScheduler* scheduler_;
   std::unordered_map<MapObjectID, std::unique_ptr<IVehicleController>>
       controller_pool_;
 };

@@ -18,8 +18,9 @@ namespace tcs {
 // TODO: Add multithread protection
 class DefaultController : public IVehicleController {
  public:
+  // Controller would take over control of Adapter's lifecycle
   DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
-                    IScheduler* scheduler, VehicleService* vehicle_service);
+                    VehicleService* vehicle_service, IScheduler* scheduler);
 
   MapObjectID GetVehicleID() override { return vehicle_->GetID(); }
 
@@ -86,8 +87,9 @@ class DefaultController : public IVehicleController {
 
   Vehicle* vehicle_;
   std::unique_ptr<IVehicleAdapter> adapter_;
-  IScheduler* scheduler_;
   VehicleService* vehicle_service_;
+  IScheduler* scheduler_;
+  
   std::optional<DriveOrder> current_drive_order_ = std::nullopt;
   std::list<MovementCommand> command_queue_;
   std::list<MovementCommand> command_sent_;

@@ -3,12 +3,12 @@
 namespace tcs {
 
 DefaultController::DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
-                                     IScheduler* scheduler,
-                                     VehicleService* vehicle_service)
+                                     VehicleService* vehicle_service,
+                                     IScheduler* scheduler)
     : vehicle_{vehicle},
       adapter_{adapter},
-      scheduler_{scheduler},
-      vehicle_service_{vehicle_service} {
+      vehicle_service_{vehicle_service},
+      scheduler_{scheduler} {
   adapter_->FinishCommandEvent().Subscribe(
       std::bind(&DefaultController::FinishCommandEventHandler, this,
                 std::placeholders::_1));

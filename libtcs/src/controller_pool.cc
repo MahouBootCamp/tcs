@@ -7,8 +7,8 @@ void ControllerPool::AttachVehicleController(MapObjectID vehicle,
   auto vehicle_ptr = map_->GetVehicle(vehicle);
   if (!vehicle_ptr) throw std::invalid_argument("Vehicle not found");
   if (!adapter) adapter = new SimVehicleAdapter{};
-  auto ptr =
-      std::make_unique<DefaultController>(vehicle_ptr, adapter, scheduler_, vehicle_service_);
+  auto ptr = std::make_unique<DefaultController>(vehicle_ptr, adapter,
+                                                 vehicle_service_, scheduler_);
   controller_pool_.insert(std::make_pair(vehicle, std::move(ptr)));
 }
 

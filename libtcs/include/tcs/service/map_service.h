@@ -11,6 +11,8 @@ class MapService {
  public:
   MapService(Map* map) : map_{map} {}
 
+  Map* GetMap() { return map_; }
+
   MapResource* GetResource(MapObjectID resource_id) {
     return map_->GetResource(resource_id);
   }
@@ -55,7 +57,8 @@ class MapService {
   SpecialLocation* GetChargeLocation() { return map_->GetChargeLocation(); }
   SpecialLocation* GetParkLocation() { return map_->GetParkLocation(); }
 
-  void UpdatePointProcessingVehicle(MapObjectID point_id, MapObjectRef vehicle_ref);
+  void UpdatePointProcessingVehicle(MapObjectID point_id,
+                                    MapObjectRef vehicle_ref);
 
  private:
   Map* map_;

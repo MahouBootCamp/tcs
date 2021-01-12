@@ -113,8 +113,8 @@ std::unordered_set<MapResource *> DefaultScheduler::ExpandBlocks(
   for (auto &resource : expanded_resources) {
     auto &blocks = resource->GetBlocks();
     for (auto &block : blocks) {
-      auto block_resources =
-          map_->GetResourcesByID(map_->GetBlock(block)->GetResources());
+      auto block_resources = map_service_->GetResourcesByID(
+          map_service_->GetBlock(block)->GetResources());
       expanded_resources.insert(block_resources.begin(), block_resources.end());
     }
   }

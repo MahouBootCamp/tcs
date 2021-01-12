@@ -6,6 +6,7 @@
 
 #include "tcs/scheduler/ischeduler.h"
 #include "tcs/scheduler/reservation_pool.h"
+#include "tcs/service/map_service.h"
 #include "tcs/util/executor.h"
 #include "tcs/util/map.h"
 
@@ -14,8 +15,8 @@ namespace tcs {
 // TODO: Add multithread protection
 class DefaultScheduler : public IScheduler {
  public:
-  DefaultScheduler(Executor *executor, Map *map)
-      : executor_{executor}, map_{map} {}
+  DefaultScheduler(Executor *executor, MapService *map_service)
+      : executor_{executor}, map_service_{map_service} {}
 
   void Claim(IVehicleController *vehicle,
              std::vector<std::unordered_set<MapResource *>> resource_sequence)
@@ -61,7 +62,7 @@ class DefaultScheduler : public IScheduler {
                      std::vector<std::unordered_set<MapResource *>>>
       claims_by_vehicle_;
   Executor *executor_;
-  Map *map_;
+  MapService *map_service_;
   ReservationPool reservation_pool_;
   // List of allocations that are currently not available.
   // OPTIMIZE: We can use a priority queue to replace this one.

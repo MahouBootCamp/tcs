@@ -9,6 +9,8 @@ namespace tcs {
 
 class TransportOrderService {
  public:
+  TransportOrderService(OrderPool* order_pool) : order_pool_{order_pool} {}
+
   Event<TransportOrderState, TransportOrderState>& OrderStateChangeEvent() {
     return order_state_change_event_;
   }

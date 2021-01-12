@@ -11,7 +11,7 @@
 using namespace tcs;
 using namespace std;
 
-Map* ProductRouterTestMap() {
+Map* BuildRouterTestMap() {
   auto builder = MapBuilder::GetInstance();
   builder.Init();
 
@@ -48,10 +48,12 @@ Map* ProductRouterTestMap() {
 class RouterTest : public ::testing::Test {
  protected:
   RouterTest()
-      : map_(ProductRouterTestMap()),
-        router_(make_unique<DefaultRouter>(map_.get())) {}
+      : map_{BuildRouterTestMap()},
+        map_service_{make_unique<MapService>(map_.get())},
+        router_{make_unique<DefaultRouter>(map_service_.get())} {}
   void SetUp() override { order_pool_.reset(new OrderPool(map_.get())); }
   unique_ptr<Map> map_;
+  unique_ptr<MapService> map_service_;
   unique_ptr<OrderPool> order_pool_;
   unique_ptr<IRouter> router_;
 };

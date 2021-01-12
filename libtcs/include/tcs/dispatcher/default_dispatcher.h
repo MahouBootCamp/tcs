@@ -28,19 +28,10 @@ namespace tcs {
 class DefaultDispatcher : public IDispatcher {
  public:
   // TODO: Imcomplete constructor
-  DefaultDispatcher(MapService* map_service, IRouter* router,
-                    Executor* executor, ControllerPool* controller_pool)
-      : map_service_{map_service},
-        router_{router},
-        executor_(executor),
-        controller_pool_{controller_pool} {
-    vehicle_service_->VehicleProcessStateChangeEvent().Subscribe(std::bind(
-        &DefaultDispatcher::VehicleProcessStateChangeEventHandler, this,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-    vehicle_service_->VehicleNeedChangeEvent().Subscribe(
-        std::bind(&DefaultDispatcher::VehicleNeedChargeEventHandler, this,
-                  std::placeholders::_1));
-  }
+  DefaultDispatcher(Executor* executor, OrderPool* order_pool,
+                    MapService* map_service, VehicleService* vehicle_service,
+                    TransportOrderService* transport_order_service,
+                    IRouter* router, ControllerPool* controller_pool);
 
   void Dispatch() override;
   void WithdrawOrder(TransportOrder* order, bool immediate) override;
@@ -57,11 +48,12 @@ class DefaultDispatcher : public IDispatcher {
 
   void VehicleNeedChargeEventHandler(Vehicle* vehicle);
 
-  MapService* map_service_;
-  IRouter* router_;
   Executor* executor_;
-  TransportOrderService* transport_order_service_;
+  OrderPool* order_pool_;
+  MapService* map_service_;
   VehicleService* vehicle_service_;
+  TransportOrderService* transport_order_service_;
+  IRouter* router_;
   ControllerPool* controller_pool_;
   std::unique_ptr<ReserveOrderPool> reserve_order_pool_;
   std::unique_ptr<UniversalDispatchUtil> universal_dispatch_util_;

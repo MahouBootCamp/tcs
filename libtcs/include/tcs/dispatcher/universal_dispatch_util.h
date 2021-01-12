@@ -17,6 +17,18 @@ namespace tcs {
 
 class UniversalDispatchUtil {
  public:
+  UniversalDispatchUtil(Executor* executor, MapService* map_service,
+                        VehicleService* vehicle_service,
+                        TransportOrderService* transport_order_service,
+                        IRouter* router, ControllerPool* controller_pool,
+                        ReserveOrderPool* reserve_order_pool)
+      : executor_{executor},
+        map_service_{map_service},
+        vehicle_service_{vehicle_service},
+        transport_order_service_{transport_order_service},
+        router_{router},
+        controller_pool_{controller_pool},
+        reserve_order_pool_{reserve_order_pool} {}
   bool CanBypassDriveOrder(DriveOrder& drive_order, Vehicle* vehicle);
   void AssignOrder(Vehicle* vehicle, TransportOrder* order,
                    std::optional<std::vector<DriveOrder>> drive_orders);
@@ -26,12 +38,13 @@ class UniversalDispatchUtil {
  private:
   void AbortOrder(Vehicle* vehicle, TransportOrder* order);
 
+  Executor* executor_;
+  MapService* map_service_;
+  VehicleService* vehicle_service_;
+  TransportOrderService* transport_order_service_;
+  IRouter* router_;
   ControllerPool* controller_pool_;
   ReserveOrderPool* reserve_order_pool_;
-  MapService* map_service_;
-  TransportOrderService* transport_order_service_;
-  VehicleService* vehicle_service_;
-  IRouter* router_;
 };
 
 }  // namespace tcs

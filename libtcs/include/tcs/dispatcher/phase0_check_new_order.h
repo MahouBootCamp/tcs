@@ -7,14 +7,14 @@ namespace tcs {
 
 class Phase0CheckNewOrder : public Phase {
  public:
-  // Phase0CheckNewOrder(IRouter* router,
-  //                     TransportOrderService* transport_order_service)
-  //     : router_{router}, transport_order_service_{transport_order_service} {}
+  Phase0CheckNewOrder(TransportOrderService* transport_order_service,
+                      IRouter* router)
+      : transport_order_service_{transport_order_service}, router_{router} {}
   void Run() override;
 
  private:
-  IRouter* router_;
   TransportOrderService* transport_order_service_;
+  IRouter* router_;
 };
 
 }  // namespace tcs
