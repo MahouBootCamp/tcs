@@ -50,7 +50,7 @@ int main(int, char**) {
   std::unique_ptr<tcs::IKernal> kernal = std::make_unique<tcs::Kernal>(map);
 
   kernal->Start();
-  std::this_thread::sleep_for(std::chrono::seconds(2));
+  std::this_thread::sleep_for(std::chrono::seconds(3));
   kernal->Exit();
   return 0;
 }

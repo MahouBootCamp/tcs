@@ -65,9 +65,9 @@ class DefaultScheduler : public IScheduler {
   MapService *map_service_;
   ReservationPool reservation_pool_;
   // List of allocations that are currently not available.
-  // OPTIMIZE: We can use a priority queue to replace this one.
   std::list<std::pair<IVehicleController *, std::unordered_set<MapResource *>>>
       deferred_allocations_;
+  std::mutex scheduler_mut_;
 };
 
 }  // namespace tcs

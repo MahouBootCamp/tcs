@@ -5,10 +5,12 @@ namespace tcs {
 void DefaultScheduler::Claim(
     IVehicleController *vehicle,
     std::vector<std::unordered_set<MapResource *>> resource_sequence) {
+  std::scoped_lock<std::mutex> lock{scheduler_mut_};
   claims_by_vehicle_.insert(std::make_pair(vehicle, resource_sequence));
 }
 
 void DefaultScheduler::Unclaim(IVehicleController *vehicle) {
+  std::scoped_lock<std::mutex> lock{scheduler_mut_};
   claims_by_vehicle_.erase(vehicle);
 }
 
@@ -20,6 +22,7 @@ void DefaultScheduler::Allocate(IVehicleController *vehicle,
 
 void DefaultScheduler::AllocateNow(
     IVehicleController *vehicle, std::unordered_set<MapResource *> resources) {
+  std::scoped_lock<std::mutex> lock{scheduler_mut_};
   if (reservation_pool_.ResourcesAvailable(vehicle, resources)) {
     for (auto &resource : resources) {
       auto &entry = reservation_pool_.GetReservationEntry(resource);
@@ -33,9 +36,10 @@ void DefaultScheduler::AllocateNow(
 void DefaultScheduler::Free(IVehicleController *vehicle,
                             std::unordered_set<MapResource *> resources) {
   // Free resources
-  reservation_pool_.Free(vehicle, resources);
-  // auto completely_free_resources =
-  //     reservation_pool_.FilterCompletelyFreeResources(resources);
+  {
+    std::scoped_lock<std::mutex> lock{scheduler_mut_};
+    reservation_pool_.Free(vehicle, resources);
+  }
 
   // Retry allocation
   RetryTask();
@@ -43,7 +47,10 @@ void DefaultScheduler::Free(IVehicleController *vehicle,
 
 void DefaultScheduler::FreeAll(IVehicleController *vehicle) {
   // Free resources
-  reservation_pool_.FreeAll(vehicle);
+  {
+    std::scoped_lock<std::mutex> lock{scheduler_mut_};
+    reservation_pool_.FreeAll(vehicle);
+  }
 
   // Retry allocation
   RetryTask();
@@ -57,8 +64,11 @@ void DefaultScheduler::AllocateTask(
     BOOST_LOG_TRIVIAL(debug)
         << "Resources unavailable for vehicle " << vehicle->GetVehicleID()
         << ". Deferring allocation...";
-    deferred_allocations_.push_back(
-        std::make_pair(vehicle, std::move(resources)));
+    {
+      std::scoped_lock<std::mutex> lock{scheduler_mut_};
+      deferred_allocations_.push_back(
+          std::make_pair(vehicle, std::move(resources)));
+    }
   }
 }
 
@@ -68,16 +78,24 @@ void DefaultScheduler::CheckTask(IVehicleController *vehicle,
     BOOST_LOG_TRIVIAL(warning)
         << "Resources are refused by vehicle " << vehicle->GetVehicleID()
         << ". Freeing them...";
-    reservation_pool_.Free(vehicle, resources);
+    {
+      std::scoped_lock<std::mutex> lock{scheduler_mut_};
+      reservation_pool_.Free(vehicle, resources);
+    }
+
     RetryTask();
   }
 }
 
 void DefaultScheduler::RetryTask() {
-  std::list<std::pair<IVehicleController *, std::unordered_set<MapResource *>>>
-      deferred_allocations_move = std::move(deferred_allocations_);
+  // Take cached allocations out & reset cache
+  std::unique_lock<std::mutex> lock{scheduler_mut_};
+  lock.lock();
+  auto deferred_allocations_move = std::move(deferred_allocations_);
   deferred_allocations_ = {};
-  for (auto &pair : deferred_allocations_) {
+  lock.unlock();
+
+  for (auto &pair : deferred_allocations_move) {
     executor_->Submit(&DefaultScheduler::AllocateTask, this, pair.first,
                       std::move(pair.second));
   }
@@ -88,6 +106,8 @@ bool DefaultScheduler::TryAllocate(
   BOOST_LOG_TRIVIAL(debug) << "Try allocating for vehicle "
                            << vehicle->GetVehicleID();
   auto expanded_resources = ExpandBlocks(resources);
+
+  std::scoped_lock<std::mutex> lock{scheduler_mut_};
   if (reservation_pool_.ResourcesAvailable(vehicle, expanded_resources)) {
     // Allocate
     BOOST_LOG_TRIVIAL(debug) << "Resources available for vehicle "

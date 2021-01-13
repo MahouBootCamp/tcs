@@ -61,7 +61,23 @@ class Kernal : public IKernal {
 
   void WithdrawTransportOrder(TransportOrderID id, bool immediate) override;
 
+  // NOTE: Following functions are for test only
+  Executor* GetExecutor() { return executor_.get(); }
+  Map* GetMap() { return map_.get(); }
+  OrderPool* GetOrderPool() { return order_pool_.get(); }
+  MapService* GetMapService() { return map_service_.get(); }
+  VehicleService* GetVehicleService() { return vehicle_service_.get(); }
+  TransportOrderService* GetTransportOrderService() {
+    return transport_order_service_.get();
+  }
+  IRouter* GetRouter() { return router_.get(); }
+  IScheduler* GetScheduler() { return scheduler_.get(); }
+  ControllerPool* GetControllerPool() { return controller_pool_.get(); }
+  IDispatcher* GetDispathcer() { return dispatcher_.get(); }
+
  private:
+  std::recursive_mutex global_mutex_;
+
   std::unique_ptr<Executor> executor_;
   std::unique_ptr<Map> map_;
   std::unique_ptr<OrderPool> order_pool_;

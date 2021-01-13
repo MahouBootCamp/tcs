@@ -12,7 +12,13 @@ void Kernal::Start() {
   state_ = KernalState::kOperating;
   quit_fut_ = on_quit_.get_future();
   monitor_ = std::thread([this]() {
-    if (quit_fut_.valid()) quit_fut_.wait();
+    // if (quit_fut_.valid()) quit_fut_.wait();
+    while (quit_fut_.valid()) {
+      if (quit_fut_.wait_for(std::chrono::seconds(2)) == std::future_status::timeout) {
+        dispatcher_->Dispatch();
+      } else
+        break;
+    }
   });
 }
 

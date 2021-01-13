@@ -45,13 +45,13 @@ DefaultDispatcher::DefaultDispatcher(
 }
 
 void DefaultDispatcher::Dispatch() {
-  BOOST_LOG_TRIVIAL(debug) << "Scheduling dispatch task...";
+  BOOST_LOG_TRIVIAL(info) << "Scheduling dispatch task...";
   executor_->Submit(&DefaultDispatcher::DispatchTask, this);
 }
 
 void DefaultDispatcher::WithdrawOrder(TransportOrder* order, bool immediate) {
   if (!immediate) {
-    BOOST_LOG_TRIVIAL(debug) << "Scheduling withdraw task...";
+    BOOST_LOG_TRIVIAL(info) << "Scheduling withdraw task...";
     executor_->Submit(&UniversalDispatchUtil::AbortOrderByOrder,
                       universal_dispatch_util_.get(), order);
   } else {
@@ -61,7 +61,7 @@ void DefaultDispatcher::WithdrawOrder(TransportOrder* order, bool immediate) {
 
 void DefaultDispatcher::WithdrawOrder(Vehicle* vehicle, bool immediate) {
   if (!immediate) {
-    BOOST_LOG_TRIVIAL(debug) << "Scheduling withdraw task...";
+    BOOST_LOG_TRIVIAL(info) << "Scheduling withdraw task...";
     executor_->Submit(&UniversalDispatchUtil::AbortOrderByVehicle,
                       universal_dispatch_util_.get(), vehicle);
   } else {

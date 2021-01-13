@@ -97,7 +97,7 @@ class DefaultController : public IVehicleController {
   std::unordered_set<MapResource*> pending_resources_;
   bool waiting_for_allocation_ = false;
   std::list<std::unordered_set<MapResource*>> allocated_resources_;
-  mutable std::mutex mut_;
+  mutable std::mutex vehicle_mut_;
 };
 
 }  // namespace tcs

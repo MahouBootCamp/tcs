@@ -32,6 +32,7 @@ void DefaultController::UpdatePositionEventHandler(MapObjectRef point_ref) {
 }
 
 void DefaultController::FinishCommandEventHandler(MovementCommand cmd) {
+  std::scoped_lock<std::mutex> lock{vehicle_mut_};
   auto cmd_sent = std::move(command_sent_.front());
   command_sent_.pop_front();
   if (cmd_sent != cmd) {
@@ -77,6 +78,7 @@ void DefaultController::UpdateVehicleStateEventHandler(VehicleState state) {
 
 bool DefaultController::AllocationSuccessful(
     std::unordered_set<MapResource*> resources) {
+  std::scoped_lock<std::mutex> lock{vehicle_mut_};
   if (pending_resources_ != resources) return false;
 
   if (!pending_command_.has_value()) {
@@ -101,6 +103,7 @@ void DefaultController::AllocationFailed() {
 }
 
 void DefaultController::SetDriveOrder(DriveOrder order) {
+  std::scoped_lock<std::mutex> lock{vehicle_mut_};
   if (current_drive_order_.has_value())
     throw std::runtime_error("vehicle " + std::to_string(vehicle_->GetID()) +
                              " already has an order");
@@ -116,6 +119,7 @@ void DefaultController::SetDriveOrder(DriveOrder order) {
 }
 
 void DefaultController::AbortDriveOrder(bool immediately) {
+  std::scoped_lock<std::mutex> lock{vehicle_mut_};
   if (immediately) {
     current_drive_order_.reset();
     waiting_for_allocation_ = false;
@@ -144,8 +148,7 @@ void DefaultController::InitPosition(MapResource* point) {
   scheduler_->AllocateNow(this, {point});
   vehicle_service_->UpdateVehicleCurrentPosition(vehicle_->GetID(),
                                                  point->GetID());
-  // TODO: Set controller private status of this allocation
-  // UNDONE: MARK WHERE I STOPPED...
+  std::scoped_lock<std::mutex> lock{vehicle_mut_};
   allocated_resources_.push_back({point});
 }
 

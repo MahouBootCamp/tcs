@@ -3,6 +3,7 @@
 namespace tcs {
 
 void Phase3AssignReservedOrder::Run() {
+  BOOST_LOG_TRIVIAL(info) << "Phase 3: Assign Reserved Transport Order...";
   auto vehicles = vehicle_service_->FilterBy([](Vehicle* v) {
     return v->GetProcessState() == ProcessState::kIdle &&
            (v->GetVehicleState() == VehicleState::kIdle ||
