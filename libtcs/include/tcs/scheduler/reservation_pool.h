@@ -11,33 +11,34 @@
 namespace tcs {
 
 struct ReservationEntry {
-  MapResource* resource;
+  const MapResource* resource;
   IVehicleController* vehicle;
   int count;  // Can only be 0 or 1
 
-  ReservationEntry(MapResource* resource)
+  ReservationEntry(const MapResource* resource)
       : resource{resource}, vehicle{nullptr}, count{0} {}
 };
 
 // Manages information of allocations
 class ReservationPool {
  public:
-  ReservationEntry& GetReservationEntry(MapResource* resource);
-  std::unordered_set<MapResource*> GetAllocatedResources(
+  ReservationEntry& GetReservationEntry(const MapResource* resource);
+  std::unordered_set<const MapResource*> GetAllocatedResources(
       IVehicleController* vehicle);
   bool ResourcesAvailable(IVehicleController* vehicle,
-                          std::unordered_set<MapResource*>& resources);
+                          std::unordered_set<const MapResource*>& resources);
   void Free(IVehicleController* vehicle,
-            std::unordered_set<MapResource*>& resources);
+            std::unordered_set<const MapResource*>& resources);
   void FreeAll(IVehicleController* vehicle);
-  std::unordered_set<MapResource*> FilterCompletelyFreeResources(
-      std::unordered_set<MapResource*>& resources);
+  std::unordered_set<const MapResource*> FilterCompletelyFreeResources(
+      const std::unordered_set<const MapResource*>& resources);
 
  private:
-  std::unordered_set<MapResource*> GetFreeableResources(
-      IVehicleController* vehicle, std::unordered_set<MapResource*>& resources);
+  std::unordered_set<const MapResource*> GetFreeableResources(
+      IVehicleController* vehicle,
+      const std::unordered_set<const MapResource*>& resources);
 
-  std::unordered_map<MapResource*, ReservationEntry> reservation_pool_;
+  std::unordered_map<const MapResource*, ReservationEntry> reservation_pool_;
 };
 
 }  // namespace tcs

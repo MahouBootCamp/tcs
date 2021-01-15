@@ -8,30 +8,30 @@
 
 namespace tcs {
 
-enum class DriveOrderState {
-  kPristine,    // Not executed
-  kTravelling,  // Vehicle travelling
-  kOperating,   // Vehicle operating
-  kFinished,
-  kFailed
-};
+// enum class DriveOrderState {
+//   kPristine,    // Not executed
+//   kTravelling,  // Vehicle travelling
+//   kOperating,   // Vehicle operating
+//   kFinished,
+//   kFailed
+// };
 
 class DriveOrder {
  public:
   DriveOrder(Destination destination) : destination_{destination} {}
 
-  Destination GetDestination() { return destination_; }
+  Destination GetDestination() const { return destination_; }
 
-  std::optional<Route>& GetRoute() { return route_; }
+  const std::optional<Route>& GetRoute() const { return route_; }
   void SetRoute(std::optional<Route> route) { route_ = route; }
 
-  DriveOrderState GetState() { return state_; }
-  void SetState(DriveOrderState state) { state_ = state; }
+  // DriveOrderState GetState() { return state_; }
+  // void SetState(DriveOrderState state) { state_ = state; }
 
  private:
   Destination destination_;
   std::optional<Route> route_ = std::nullopt;
-  DriveOrderState state_ = DriveOrderState::kPristine;
+  // DriveOrderState state_ = DriveOrderState::kPristine;
 };
 
 }  // namespace tcs

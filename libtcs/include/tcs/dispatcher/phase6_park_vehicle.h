@@ -23,7 +23,7 @@ class Phase6ParkVehicle : public Phase {
   void Run() override;
 
  private:
-  void CreateParkOrder(Vehicle* vehicle);
+  void CreateParkOrder(const Vehicle* vehicle);
 
   OrderPool* order_pool_;
   MapService* map_service_;

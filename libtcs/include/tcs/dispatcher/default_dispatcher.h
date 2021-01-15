@@ -34,19 +34,19 @@ class DefaultDispatcher : public IDispatcher {
                     IRouter* router, ControllerPool* controller_pool);
 
   void Dispatch() override;
-  void WithdrawOrder(TransportOrder* order, bool immediate) override;
-  void WithdrawOrder(Vehicle* vehicle, bool immediate) override;
+  void WithdrawOrder(const TransportOrder* order, bool immediate) override;
+  void WithdrawOrder(const Vehicle* vehicle, bool immediate) override;
 
  private:
   void DispatchTask();
 
   void DispatchPeriodically();
 
-  void VehicleProcessStateChangeEventHandler(Vehicle* vehicle,
+  void VehicleProcessStateChangeEventHandler(const Vehicle* vehicle,
                                              ProcessState old_state,
                                              ProcessState new_state);
 
-  void VehicleNeedChargeEventHandler(Vehicle* vehicle);
+  void VehicleNeedChargeEventHandler(const Vehicle* vehicle);
 
   Executor* executor_;
   OrderPool* order_pool_;

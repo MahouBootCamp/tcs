@@ -6,12 +6,12 @@
 namespace tcs {
 
 struct AssignmentCandidate {
-  Vehicle* vehicle;
-  TransportOrder* transport_order;
+  const Vehicle* vehicle;
+  const TransportOrder* transport_order;
   std::optional<std::vector<DriveOrder>> drive_orders;
   double total_cost;
 
-  AssignmentCandidate(Vehicle* vehicle, TransportOrder* transport_order,
+  AssignmentCandidate(const Vehicle* vehicle, const TransportOrder* transport_order,
                       std::optional<std::vector<DriveOrder>> drive_orders)
       : vehicle{vehicle},
         transport_order{transport_order},

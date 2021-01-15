@@ -3,20 +3,20 @@
 namespace tcs {
 
 bool UniversalDispatchUtil::CanBypassDriveOrder(DriveOrder &drive_order,
-                                                Vehicle *vehicle) {
+                                                const Vehicle *vehicle) {
   return drive_order.GetRoute()->GetSteps().back().destination->GetID() ==
-             vehicle->GetCurrentPoint()
+             vehicle_service_->ReadVehicleCurrentPosition(vehicle->GetID())
                  .value()  // Destination point is current point
          && drive_order.GetDestination().operation ==
                 kNoOperation;  // No operation to do
 }
 
 void UniversalDispatchUtil::AssignOrder(
-    Vehicle *vehicle, TransportOrder *order,
+    const Vehicle *vehicle, const TransportOrder *order,
     std::optional<std::vector<DriveOrder> > drive_orders) {
   auto vehicle_id = vehicle->GetID();
   auto order_id = order->GetID();
-  if (vehicle->GetTransportOrder().has_value()) {
+  if (vehicle_service_->ReadVehicleTransportOrder(vehicle_id).has_value()) {
     // If has dispensable order, abort it and reserve new order to wait for
     // abortion.
     BOOST_LOG_TRIVIAL(debug)
@@ -38,10 +38,12 @@ void UniversalDispatchUtil::AssignOrder(
     vehicle_service_->UpdateVehicleTransportOrder(vehicle_id, order_id);
     transport_order_service_->UpdateOrderVehicleAndDriveOrder(
         order_id, vehicle_id, std::move(drive_orders));
-    router_->SelectRoute(vehicle, order->GetDriveOrders());
+    router_->SelectRoute(
+        vehicle, transport_order_service_->ReadOrderDriveOrders(order_id));
 
     // Check first drive order
-    auto &first_drive_order = order->GetDriveOrders().front();
+    auto first_drive_order =
+        transport_order_service_->ReadOrderDriveOrders(order_id).front();
     if (CanBypassDriveOrder(first_drive_order, vehicle)) {
       vehicle_service_->UpdateVehicleProcessState(vehicle_id,
                                                   ProcessState::kAwaitingOrder);
@@ -52,8 +54,9 @@ void UniversalDispatchUtil::AssignOrder(
   }
 }
 
-void UniversalDispatchUtil::AbortOrderByVehicle(Vehicle *vehicle) {
-  auto order_ref = vehicle->GetTransportOrder();
+void UniversalDispatchUtil::AbortOrderByVehicle(const Vehicle *vehicle) {
+  auto order_ref =
+      vehicle_service_->ReadVehicleTransportOrder(vehicle->GetID());
   if (order_ref.has_value()) {
     auto order = transport_order_service_->GetTransportOrder(order_ref.value());
     AbortOrder(vehicle, order);
@@ -63,26 +66,29 @@ void UniversalDispatchUtil::AbortOrderByVehicle(Vehicle *vehicle) {
   }
 }
 
-void UniversalDispatchUtil::AbortOrderByOrder(TransportOrder *order) {
-  auto vehicle_ref = order->GetVehicle();
+void UniversalDispatchUtil::AbortOrderByOrder(const TransportOrder *order) {
+  auto vehicle_ref = transport_order_service_->ReadOrderVehicle(order->GetID());
   if (vehicle_ref.has_value()) {
     // Abort order
     auto vehicle = vehicle_service_->GetVehicle(vehicle_ref.value());
     AbortOrder(vehicle, order);
   } else {
     // No vehicle processing it, so just mark it failed.
-    if (!IsFinalState(order->GetState())) {
-      transport_order_service_->UpdateOrderState(order->GetID(),
+    auto order_id = order->GetID();
+    if (!IsFinalState(transport_order_service_->ReadOrderState(order_id))) {
+      transport_order_service_->UpdateOrderState(order_id,
                                                  TransportOrderState::kFailed);
-      reserve_order_pool_->RemoveReservationByOrder(order->GetID());
+      reserve_order_pool_->RemoveReservationByOrder(order_id);
     }
   }
 }
 
-void UniversalDispatchUtil::AbortOrder(Vehicle *vehicle,
-                                       TransportOrder *order) {
-  if (!IsFinalState(order->GetState()) &&
-      order->GetState() != TransportOrderState::kWithdraw) {
+void UniversalDispatchUtil::AbortOrder(const Vehicle *vehicle,
+                                       const TransportOrder *order) {
+  auto current_order_state =
+      transport_order_service_->ReadOrderState(order->GetID());
+  if (!IsFinalState(current_order_state) &&
+      current_order_state != TransportOrderState::kWithdraw) {
     transport_order_service_->UpdateOrderState(order->GetID(),
                                                TransportOrderState::kWithdraw);
   }

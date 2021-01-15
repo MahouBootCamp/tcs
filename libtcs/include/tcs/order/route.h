@@ -10,9 +10,9 @@ namespace tcs {
 
 struct Step {
   std::size_t index;
-  Point* source;
-  Point* destination;
-  Path* path;
+  const Point* source;
+  const Point* destination;
+  const Path* path;
   // MapObjectID source;
   // MapObjectID destination;
   // MapObjectID path;
@@ -28,8 +28,8 @@ class Route {
   Route() = default;
   Route(std::vector<Step> steps, double cost) : steps_{steps}, cost_{cost} {}
 
-  std::vector<Step>& GetSteps() { return steps_; }
-  double GetCost() { return cost_; }
+  const std::vector<Step>& GetSteps() const { return steps_; }
+  double GetCost() const { return cost_; }
 
  private:
   std::vector<Step> steps_;

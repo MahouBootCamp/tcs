@@ -29,8 +29,13 @@ DefaultDispatcher::DefaultDispatcher(
               router_,
               reserve_order_pool_.get(),
               universal_dispatch_util_.get()},
-      phase4_{map_service_, vehicle_service_, transport_order_service_,
-              router_,      controller_pool_, reserve_order_pool_.get()},
+      phase4_{map_service_,
+              vehicle_service_,
+              transport_order_service_,
+              router_,
+              controller_pool_,
+              reserve_order_pool_.get(),
+              universal_dispatch_util_.get()},
       phase5_{order_pool_, map_service_, vehicle_service_, router_,
               universal_dispatch_util_.get()},
       phase6_{order_pool_, map_service_, vehicle_service_, router_,
@@ -49,7 +54,8 @@ void DefaultDispatcher::Dispatch() {
   executor_->Submit(&DefaultDispatcher::DispatchTask, this);
 }
 
-void DefaultDispatcher::WithdrawOrder(TransportOrder* order, bool immediate) {
+void DefaultDispatcher::WithdrawOrder(const TransportOrder* order,
+                                      bool immediate) {
   if (!immediate) {
     BOOST_LOG_TRIVIAL(info) << "Scheduling withdraw task...";
     executor_->Submit(&UniversalDispatchUtil::AbortOrderByOrder,
@@ -59,7 +65,7 @@ void DefaultDispatcher::WithdrawOrder(TransportOrder* order, bool immediate) {
   }
 }
 
-void DefaultDispatcher::WithdrawOrder(Vehicle* vehicle, bool immediate) {
+void DefaultDispatcher::WithdrawOrder(const Vehicle* vehicle, bool immediate) {
   if (!immediate) {
     BOOST_LOG_TRIVIAL(info) << "Scheduling withdraw task...";
     executor_->Submit(&UniversalDispatchUtil::AbortOrderByVehicle,
@@ -82,17 +88,20 @@ void DefaultDispatcher::DispatchTask() {
 void DefaultDispatcher::DispatchPeriodically() {}
 
 void DefaultDispatcher::VehicleProcessStateChangeEventHandler(
-    Vehicle* vehicle, ProcessState old_state, ProcessState new_state) {
-  if (vehicle->GetIntegrationLevel() == IntegrationLevel::kUtilized) {
+    const Vehicle* vehicle, ProcessState old_state, ProcessState new_state) {
+  if (vehicle_service_->ReadVehicleIntegrationLevel(vehicle->GetID()) ==
+      IntegrationLevel::kUtilized) {
     if (old_state != new_state && (new_state == ProcessState::kAwaitingOrder ||
                                    new_state == ProcessState::kIdle))
       Dispatch();
   }
 }
 
-void DefaultDispatcher::VehicleNeedChargeEventHandler(Vehicle* vehicle) {
-  if (vehicle->GetIntegrationLevel() == IntegrationLevel::kUtilized &&
-      vehicle->GetNeedCharge()) {
+void DefaultDispatcher::VehicleNeedChargeEventHandler(const Vehicle* vehicle) {
+  auto vehicle_id = vehicle->GetID();
+  if (vehicle_service_->ReadVehicleIntegrationLevel(vehicle_id) ==
+          IntegrationLevel::kUtilized &&
+      vehicle_service_->ReadVehicleNeedCharge(vehicle_id)) {
     Dispatch();
   }
 }

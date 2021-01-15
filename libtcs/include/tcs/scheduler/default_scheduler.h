@@ -19,8 +19,8 @@ class DefaultScheduler : public IScheduler {
       : executor_{executor}, map_service_{map_service} {}
 
   void Claim(IVehicleController *vehicle,
-             std::vector<std::unordered_set<MapResource *>> resource_sequence)
-      override;
+             std::vector<std::unordered_set<const MapResource *>>
+                 resource_sequence) override;
 
   void Unclaim(IVehicleController *vehicle) override;
 
@@ -30,42 +30,43 @@ class DefaultScheduler : public IScheduler {
   }
 
   void Allocate(IVehicleController *vehicle,
-                std::unordered_set<MapResource *> resources) override;
+                std::unordered_set<const MapResource *> resources) override;
 
   // Throw if resources unavailable.
   void AllocateNow(IVehicleController *vehicle,
-                   std::unordered_set<MapResource *> resources) override;
+                   std::unordered_set<const MapResource *> resources) override;
 
   void Free(IVehicleController *vehicle,
-            std::unordered_set<MapResource *> resources) override;
+            std::unordered_set<const MapResource *> resources) override;
 
   void FreeAll(IVehicleController *vehicle) override;
 
  private:
   void AllocateTask(IVehicleController *vehicle,
-                    std::unordered_set<MapResource *> resources);
+                    std::unordered_set<const MapResource *> resources);
   // void ReleaseTask(IVehicleController *vehicle,
   //                  std::unordered_set<MapResource *> resources);
   void CheckTask(IVehicleController *vehicle,
-                 std::unordered_set<MapResource *> resources);
+                 std::unordered_set<const MapResource *> resources);
   void RetryTask();
 
   // Try allocate resources for vehicle. Return successful or not.
   bool TryAllocate(IVehicleController *vehicle,
-                   std::unordered_set<MapResource *> &resources);
+                   std::unordered_set<const MapResource *> &resources);
 
   // Expand resources in blocks.
-  std::unordered_set<MapResource *> ExpandBlocks(
-      std::unordered_set<MapResource *> &resources);
+  std::unordered_set<const MapResource *> ExpandBlocks(const
+      std::unordered_set<const MapResource *> &resources);
 
   std::unordered_map<IVehicleController *,
-                     std::vector<std::unordered_set<MapResource *>>>
+                     std::vector<std::unordered_set<const MapResource *>>>
       claims_by_vehicle_;
   Executor *executor_;
   MapService *map_service_;
   ReservationPool reservation_pool_;
   // List of allocations that are currently not available.
-  std::list<std::pair<IVehicleController *, std::unordered_set<MapResource *>>>
+  std::list<
+      std::pair<IVehicleController *, std::unordered_set<const MapResource *>>>
       deferred_allocations_;
   std::mutex scheduler_mut_;
 };

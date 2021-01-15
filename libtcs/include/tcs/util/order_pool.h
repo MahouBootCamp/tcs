@@ -20,13 +20,13 @@ class OrderPool {
   // Map* MUST NOT be nullptr
   OrderPool(Map* map) : map_{map} {}
 
-  TransportOrder* GetOrder(TransportOrderID);
+  TransportOrder* GetOrder(TransportOrderID) const;
   TransportOrderID AddOrder(
       std::vector<Destination> destinations,
       std::unordered_set<TransportOrderID> dependencies = {});
-  std::unordered_set<TransportOrder*> GetAllOrders();
-  std::unordered_set<TransportOrder*> GetOrdersByID(
-      std::unordered_set<TransportOrderID>& id_set);
+  std::unordered_set<TransportOrder*> GetAllOrders() const;
+  std::unordered_set<const TransportOrder*> GetOrdersByID(
+      std::unordered_set<TransportOrderID>& id_set) const;
 
  private:
   // mutable std::recursive_mutex mut_;

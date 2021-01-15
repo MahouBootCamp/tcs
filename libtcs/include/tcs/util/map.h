@@ -28,15 +28,15 @@ class Map {
   Block* GetBlock(MapObjectID id);
   Vehicle* GetVehicle(MapObjectID id);
 
-  std::unordered_set<MapResource*> GetResourcesByID(
-      std::unordered_set<MapObjectID>& id_set);
+  std::unordered_set<const MapResource*> GetResourcesByID(
+      const std::unordered_set<MapObjectID>& id_set);
 
-  std::unordered_set<MapResource*> GetAllResources();
-  std::unordered_set<Point*> GetAllPoints();
-  std::unordered_set<Path*> GetAllPaths();
-  std::unordered_set<Location*> GetAllLocations();
-  std::unordered_set<Block*> GetAllBlocks();
-  std::unordered_set<Vehicle*> GetAllVehicles();
+  std::unordered_set<const MapResource*> GetAllResources();
+  std::unordered_set<const Point*> GetAllPoints();
+  std::unordered_set<const Path*> GetAllPaths();
+  std::unordered_set<const Location*> GetAllLocations();
+  std::unordered_set<const Block*> GetAllBlocks();
+  std::unordered_set<const Vehicle*> GetAllVehicles();
 
   SpecialLocation* GetChargeLocation() { return charge_location_; }
   SpecialLocation* GetParkLocation() { return park_location_; }

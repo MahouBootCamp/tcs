@@ -12,13 +12,14 @@ void Phase3AssignReservedOrder::Run() {
   for (auto& vehicle : vehicles) CheckForReservedOrder(vehicle);
 }
 
-void Phase3AssignReservedOrder::CheckForReservedOrder(Vehicle* vehicle) {
+void Phase3AssignReservedOrder::CheckForReservedOrder(const Vehicle* vehicle) {
   auto reserved_orders =
       reserve_order_pool_->GetReservationsByVehicle(vehicle->GetID());
-  TransportOrder* selected_order = nullptr;
+  const TransportOrder* selected_order = nullptr;
   for (auto& order_id : reserved_orders) {
     auto order = transport_order_service_->GetTransportOrder(order_id);
-    if (order->GetState() == TransportOrderState::kDispatchable) {
+    if (transport_order_service_->ReadOrderState(order_id) ==
+        TransportOrderState::kDispatchable) {
       selected_order = order;
       break;
     }
@@ -27,8 +28,8 @@ void Phase3AssignReservedOrder::CheckForReservedOrder(Vehicle* vehicle) {
   if (!selected_order) return;
 
   reserve_order_pool_->RemoveReservationByOrder(selected_order->GetID());
-  auto current_point =
-      map_service_->GetPoint(vehicle->GetCurrentPoint().value());
+  auto current_point = map_service_->GetPoint(
+      vehicle_service_->ReadVehicleCurrentPosition(vehicle->GetID()).value());
   auto drive_order = router_->GetRoute(current_point, selected_order);
   if (!drive_order.has_value())
     // REVIEW: Next point of vehicle may be unroutable?

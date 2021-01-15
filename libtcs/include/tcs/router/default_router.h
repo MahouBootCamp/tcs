@@ -7,6 +7,7 @@
 #include "tcs/router/irouter.h"
 #include "tcs/router/shortest_path_algorithm.h"
 #include "tcs/service/map_service.h"
+#include "tcs/service/transport_order_service.h"
 #include "tcs/util/map.h"
 
 namespace tcs {
@@ -14,29 +15,33 @@ namespace tcs {
 class DefaultRouter : public IRouter {
  public:
   // REVIEW: Use map service instead of map pointer?
-  DefaultRouter(MapService *map_service)
-      : map_service_{map_service}, algo_{map_service_->GetMap()} {}
+  DefaultRouter(MapService *map_service,
+                TransportOrderService *transport_order_service)
+      : map_service_{map_service},
+        transport_order_service_{transport_order_service},
+        algo_{map_service} {}
 
-  bool ChechRoutability(TransportOrder *order) override;
+  bool ChechRoutability(const TransportOrder *order) override;
   std::optional<std::vector<DriveOrder>> GetRoute(
-      Point *start_point, TransportOrder *order) override;
-  std::optional<Route> GetRoute(Point *start_point,
-                                Point *destination_point) override;
-  double GetCost(Point *start_point, Point *destination_point) override;
-  void SelectRoute(Vehicle *vehicle,
+      const Point *start_point, const TransportOrder *order) override;
+  std::optional<Route> GetRoute(const Point *start_point,
+                                const Point *destination_point) override;
+  double GetCost(const Point *start_point,
+                 const Point *destination_point) override;
+  void SelectRoute(const Vehicle *vehicle,
                    std::vector<DriveOrder> drive_orders) override;
 
-  std::unordered_map<Vehicle *, std::vector<DriveOrder>> GetSelectedRoutes()
-      override;
+  std::unordered_map<const Vehicle *, std::vector<DriveOrder>>
+  GetSelectedRoutes() override;
 
-  std::unordered_set<Point *> GetTargetedPoints() override;
+  std::unordered_set<const Point *> GetTargetedPoints() override;
 
  private:
   // REVIEW: Move this function into map service?
-  std::unordered_set<Point *> ExpandDestination(DriveOrder &drive_order);
+  std::unordered_set<const Point *> ExpandDestination(DriveOrder &drive_order);
 
   bool CheckRoutability(std::vector<DriveOrder> &drive_orders,
-                        std::size_t index = 0, Point *point = nullptr);
+                        std::size_t index = 0, const Point *point = nullptr);
 
   struct RouteResult {
     std::vector<DriveOrder> current_route;
@@ -47,13 +52,14 @@ class DefaultRouter : public IRouter {
   };
 
   void ComputeRoute(std::vector<DriveOrder> &drive_orders, RouteResult &result,
-                    std::size_t index = 0, Point *point = nullptr);
+                    std::size_t index = 0, const Point *point = nullptr);
 
   // Protect cached routes
   mutable std::mutex mut_;
 
   MapService *map_service_;
-  std::unordered_map<Vehicle *, std::vector<DriveOrder>> selected_routes_;
+  TransportOrderService *transport_order_service_;
+  std::unordered_map<const Vehicle *, std::vector<DriveOrder>> selected_routes_;
   ShortestPathAlgorithm algo_;
 };
 

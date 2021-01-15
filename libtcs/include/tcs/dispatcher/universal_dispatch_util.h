@@ -3,7 +3,6 @@
 
 #include <boost/log/trivial.hpp>
 
-#include "tcs/dispatcher/idispatcher.h"
 #include "tcs/dispatcher/reserve_order_pool.h"
 #include "tcs/router/irouter.h"
 #include "tcs/service/map_service.h"
@@ -29,14 +28,14 @@ class UniversalDispatchUtil {
         router_{router},
         controller_pool_{controller_pool},
         reserve_order_pool_{reserve_order_pool} {}
-  bool CanBypassDriveOrder(DriveOrder& drive_order, Vehicle* vehicle);
-  void AssignOrder(Vehicle* vehicle, TransportOrder* order,
+  bool CanBypassDriveOrder(DriveOrder& drive_order, const Vehicle* vehicle);
+  void AssignOrder(const Vehicle* vehicle, const TransportOrder* order,
                    std::optional<std::vector<DriveOrder>> drive_orders);
-  void AbortOrderByVehicle(Vehicle* vehicle);
-  void AbortOrderByOrder(TransportOrder* order);
+  void AbortOrderByVehicle(const Vehicle* vehicle);
+  void AbortOrderByOrder(const TransportOrder* order);
 
  private:
-  void AbortOrder(Vehicle* vehicle, TransportOrder* order);
+  void AbortOrder(const Vehicle* vehicle, const TransportOrder* order);
 
   Executor* executor_;
   MapService* map_service_;

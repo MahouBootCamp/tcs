@@ -8,21 +8,21 @@ void Phase1FinishWithdrawal::Run() {
       ProcessState::kAwaitingOrder);
   for (auto& vehicle : vehicles) {
     auto order = transport_order_service_->GetTransportOrder(
-        vehicle->GetTransportOrder().value());
-    if (order->GetState() == TransportOrderState::kWithdraw) {
+        vehicle_service_->ReadVehicleTransportOrder(vehicle->GetID()).value());
+    if (transport_order_service_->ReadOrderState(order->GetID()) ==
+        TransportOrderState::kWithdraw) {
       FinishWithDrawal(vehicle, order);
     }
   }
 }
 
-void Phase1FinishWithdrawal::FinishWithDrawal(Vehicle* vehicle,
-                                              TransportOrder* order) {
-  transport_order_service_->UpdateOrderState(
-      vehicle->GetTransportOrder().value(), TransportOrderState::kFailed);
+void Phase1FinishWithdrawal::FinishWithDrawal(const Vehicle* vehicle,
+                                              const TransportOrder* order) {
+  transport_order_service_->UpdateOrderState(order->GetID(),
+                                             TransportOrderState::kFailed);
   vehicle_service_->UpdateVehicleProcessState(vehicle->GetID(),
                                               ProcessState::kIdle);
-  vehicle_service_->UpdateVehicleTransportOrder(vehicle->GetID(),
-                                                std::nullopt);
+  vehicle_service_->UpdateVehicleTransportOrder(vehicle->GetID(), std::nullopt);
   router_->SelectRoute(vehicle, {});
 
   // If charge / park order, cancel reservation of charge point

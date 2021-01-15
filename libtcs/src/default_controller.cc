@@ -2,7 +2,8 @@
 
 namespace tcs {
 
-DefaultController::DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
+DefaultController::DefaultController(const Vehicle* vehicle,
+                                     IVehicleAdapter* adapter,
                                      VehicleService* vehicle_service,
                                      IScheduler* scheduler)
     : vehicle_{vehicle},
@@ -46,7 +47,7 @@ void DefaultController::FinishCommandEventHandler(MovementCommand cmd) {
   }
 
   vehicle_service_->UpdateVehicleRouteProgressIndex(
-      vehicle_id, vehicle_->GetRouteProgressIndex() + 1);
+      vehicle_id, vehicle_service_->ReadVehicleRouteProgressIndex(vehicle_id));
   auto resources = std::move(allocated_resources_.front());
   allocated_resources_.pop_front();
   scheduler_->Free(this, resources);
@@ -77,7 +78,7 @@ void DefaultController::UpdateVehicleStateEventHandler(VehicleState state) {
 }
 
 bool DefaultController::AllocationSuccessful(
-    std::unordered_set<MapResource*> resources) {
+    std::unordered_set<const MapResource*> resources) {
   std::scoped_lock<std::mutex> lock{vehicle_mut_};
   if (pending_resources_ != resources) return false;
 
@@ -144,7 +145,7 @@ void DefaultController::AbortDriveOrder(bool immediately) {
   }
 }
 
-void DefaultController::InitPosition(MapResource* point) {
+void DefaultController::InitPosition(const MapResource* point) {
   scheduler_->AllocateNow(this, {point});
   vehicle_service_->UpdateVehicleCurrentPosition(vehicle_->GetID(),
                                                  point->GetID());
@@ -152,14 +153,14 @@ void DefaultController::InitPosition(MapResource* point) {
   allocated_resources_.push_back({point});
 }
 
-std::vector<std::unordered_set<MapResource*>>
+std::vector<std::unordered_set<const MapResource*>>
 DefaultController::ExpandDriveOrder(DriveOrder& order) {
-  std::vector<std::unordered_set<MapResource*>> res;
+  std::vector<std::unordered_set<const MapResource*>> result;
   auto& steps = order.GetRoute()->GetSteps();
   for (auto& step : steps) {
-    res.push_back({step.destination, step.path});
+    result.push_back({step.destination, step.path});
   }
-  return res;
+  return result;
 }
 
 void DefaultController::CreateFutureCommands(DriveOrder& order) {
@@ -187,7 +188,7 @@ void DefaultController::AllocateForNextCommand() {
   pending_command_ = cmd;
 }
 
-std::unordered_set<MapResource*> DefaultController::ExpandMovementCommand(
+std::unordered_set<const MapResource*> DefaultController::ExpandMovementCommand(
     MovementCommand& cmd) {
   return {cmd.step.destination, cmd.step.path};
 }

@@ -2,7 +2,7 @@
 
 namespace tcs {
 
-TransportOrder* OrderPool::GetOrder(TransportOrderID id) {
+TransportOrder* OrderPool::GetOrder(TransportOrderID id) const {
   // std::scoped_lock<std::recursive_mutex> lk{mut_};
   auto itr = order_pool_.find(id);
   if (itr == order_pool_.end())
@@ -35,7 +35,7 @@ TransportOrderID OrderPool::AddOrder(
   return tmp;
 }
 
-std::unordered_set<TransportOrder*> OrderPool::GetAllOrders() {
+std::unordered_set<TransportOrder*> OrderPool::GetAllOrders() const {
   std::unordered_set<TransportOrder*> result;
   for (auto& pair : order_pool_) {
     result.insert(pair.second.get());
@@ -43,9 +43,9 @@ std::unordered_set<TransportOrder*> OrderPool::GetAllOrders() {
   return result;
 }
 
-std::unordered_set<TransportOrder*> OrderPool::GetOrdersByID(
-    std::unordered_set<TransportOrderID>& id_set) {
-  std::unordered_set<TransportOrder*> result;
+std::unordered_set<const TransportOrder*> OrderPool::GetOrdersByID(
+    std::unordered_set<TransportOrderID>& id_set) const {
+  std::unordered_set<const TransportOrder*> result;
   for (auto& id : id_set) {
     result.insert(GetOrder(id));
   }

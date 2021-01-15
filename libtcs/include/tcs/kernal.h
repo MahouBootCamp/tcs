@@ -36,7 +36,8 @@ class Kernal : public IKernal {
         vehicle_service_{std::make_unique<VehicleService>(map)},
         transport_order_service_{
             std::make_unique<TransportOrderService>(order_pool_.get())},
-        router_{std::make_unique<DefaultRouter>(map_service_.get())},
+        router_{std::make_unique<DefaultRouter>(
+            map_service_.get(), transport_order_service_.get())},
         scheduler_{std::make_unique<DefaultScheduler>(executor_.get(),
                                                       map_service_.get())},
         controller_pool_{std::make_unique<ControllerPool>(

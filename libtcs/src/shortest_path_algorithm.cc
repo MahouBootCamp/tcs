@@ -2,9 +2,9 @@
 
 namespace tcs {
 
-ShortestPathAlgorithm::ShortestPathAlgorithm(Map* map)
-    : paths_(map->GetAllPaths()) {
-  auto points = map->GetAllPoints();
+ShortestPathAlgorithm::ShortestPathAlgorithm(MapService* map_service)
+    : paths_(map_service->GetAllPaths()) {
+  auto points = map_service->GetAllPoints();
 
   for (auto& point : points) {
     auto vertex = boost::add_vertex(graph_);
@@ -13,15 +13,15 @@ ShortestPathAlgorithm::ShortestPathAlgorithm(Map* map)
   }
 
   for (auto& path : paths_) {
-    auto src = point_to_vertex_dict_[map->GetPoint(path->GetSource())];
-    auto dst = point_to_vertex_dict_[map->GetPoint(path->GetDestination())];
+    auto src = point_to_vertex_dict_[map_service->GetPoint(path->GetSource())];
+    auto dst = point_to_vertex_dict_[map_service->GetPoint(path->GetDestination())];
     auto edge = boost::add_edge(src, dst, path->GetLength(), graph_);
     if (!edge.second)
       throw std::invalid_argument("Constructing dijkstra algorithm failed");
   }
 }
 
-bool ShortestPathAlgorithm::Routable(Point* source, Point* destination) {
+bool ShortestPathAlgorithm::Routable(const Point* source, const Point* destination) {
   if (source == destination) return true;
   auto boost_dst = point_to_vertex_dict_[destination];
   std::vector<BoostVertex> parent_vector(num_vertices(graph_));
@@ -35,8 +35,8 @@ bool ShortestPathAlgorithm::Routable(Point* source, Point* destination) {
     return true;
 }
 
-std::optional<Route> ShortestPathAlgorithm::ComputeRoute(Point* source,
-                                                         Point* destination) {
+std::optional<Route> ShortestPathAlgorithm::ComputeRoute(const Point* source,
+                                                         const Point* destination) {
   if (source == destination)
     return Route{};  // Return a empty route with 0 cost
 
@@ -82,7 +82,7 @@ std::vector<Step> ShortestPathAlgorithm::PathToSteps(
       auto dst = vertex_to_point_dict_[*itr];
       i += 1;
       auto path_itr =
-          std::find_if(paths_.begin(), paths_.end(), [src, dst](Path* p) {
+          std::find_if(paths_.begin(), paths_.end(), [src, dst](const Path* p) {
             return p->GetSource() == src->GetID() &&
                    p->GetDestination() == dst->GetID();
           });

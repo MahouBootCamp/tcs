@@ -13,8 +13,8 @@ enum class MapObjectType { kPoint, kPath, kLocation, kBlock, kVehicle };
 class MapObject {
  public:
   MapObject(MapObjectID id, MapObjectType type) : id_{id}, type_{type} {}
-  MapObjectID GetID() { return id_; }
-  MapObjectType GetType() { return type_; }
+  MapObjectID GetID() const { return id_; }
+  MapObjectType GetType() const { return type_; }
 
  private:
   MapObjectID id_;

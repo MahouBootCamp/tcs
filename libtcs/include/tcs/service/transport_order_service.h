@@ -11,13 +11,14 @@ class TransportOrderService {
  public:
   TransportOrderService(OrderPool* order_pool) : order_pool_{order_pool} {}
 
-  Event<TransportOrderState, TransportOrderState>& OrderStateChangeEvent() {
+  Event<const TransportOrder*, TransportOrderState, TransportOrderState>&
+  OrderStateChangeEvent() {
     return order_state_change_event_;
   }
 
   template <class Predicate>
-  std::unordered_set<TransportOrder*> FilterBy(Predicate p) {
-    std::unordered_set<TransportOrder*> result;
+  std::unordered_set<const TransportOrder*> FilterBy(Predicate p) const {
+    std::unordered_set<const TransportOrder*> result;
     auto orders = order_pool_->GetAllOrders();
     for (auto& order : orders) {
       if (p(order)) result.insert(order);
@@ -25,37 +26,43 @@ class TransportOrderService {
     return result;
   }
 
-  std::unordered_set<TransportOrder*> FilterOrdersByState(
+  std::unordered_set<const TransportOrder*> FilterOrdersByState(
       TransportOrderState state) {
     return FilterBy(
         [&state](TransportOrder* order) { return order->GetState() == state; });
   }
 
-  TransportOrder* GetTransportOrder(TransportOrderID id) {
+  const TransportOrder* GetTransportOrder(TransportOrderID id) const {
     return order_pool_->GetOrder(id);
   }
 
-  std::unordered_set<TransportOrder*> GetTransportOrdersByID(
-      std::unordered_set<TransportOrderID>& id_set) {
+  std::unordered_set<const TransportOrder*> GetTransportOrdersByID(
+      std::unordered_set<TransportOrderID>& id_set) const {
     return order_pool_->GetOrdersByID(id_set);
   }
 
   bool HasUnfinishedDependencies(TransportOrderID order_id);
 
+  TransportOrderState ReadOrderState(TransportOrderID order_id) const;
   void UpdateOrderState(TransportOrderID order_id, TransportOrderState state);
 
-  // void UpdateOrderWithDependencyFinished(TransportOrderID finished_id);
+  std::size_t ReadOrderProgressIndex(TransportOrderID order_id) const;
+  std::vector<DriveOrder> ReadOrderFutureDriveOrders(
+      TransportOrderID order_id) const;
+  void UpdateOrderNextDriveOrder(TransportOrderID order_id);
 
-  void UpdateOrderNextDriveOrder(TransportOrderID id);
-
+  std::vector<DriveOrder> ReadOrderDriveOrders(
+      TransportOrderID order_id) const;
+  MapObjectRef ReadOrderVehicle(TransportOrderID order_id) const;
   // Since the vehicle and driveorder would be decided at the same time, they
   // are set in one function
   void UpdateOrderVehicleAndDriveOrder(
-      TransportOrderID id, MapObjectRef vehicle_ref,
+      TransportOrderID order_id, MapObjectRef vehicle_ref,
       std::optional<std::vector<DriveOrder>> drive_orders);
 
  private:
-  Event<TransportOrderState, TransportOrderState> order_state_change_event_;
+  Event<const TransportOrder*, TransportOrderState, TransportOrderState>
+      order_state_change_event_;
   OrderPool* order_pool_;
 };
 

@@ -11,13 +11,15 @@ void Phase2AssignNextDriveOrder::Run() {
   }
 }
 
-void Phase2AssignNextDriveOrder::CheckForNextOrder(Vehicle* vehicle) {
+void Phase2AssignNextDriveOrder::CheckForNextOrder(const Vehicle* vehicle) {
   auto vehicle_id = vehicle->GetID();
-  auto order_id = vehicle->GetTransportOrder().value();
+  auto order_id =
+      vehicle_service_->ReadVehicleTransportOrder(vehicle_id).value();
   transport_order_service_->UpdateOrderNextDriveOrder(order_id);
   auto order = transport_order_service_->GetTransportOrder(order_id);
   // Check if transport order is finished
-  if (order->GetProgressIndex() == order->GetDriveOrders().size()) {
+  if (transport_order_service_->ReadOrderDriveOrders(order_id).size() ==
+      transport_order_service_->ReadOrderProgressIndex(order_id)) {
     BOOST_LOG_TRIVIAL(info)
         << "Vehicle " << vehicle_id << " finished transport order " << order_id;
     // Update order to kFinished
@@ -50,7 +52,9 @@ void Phase2AssignNextDriveOrder::CheckForNextOrder(Vehicle* vehicle) {
   } else {
     BOOST_LOG_TRIVIAL(info)
         << "Assigning next drive order to vehicle " << vehicle_id;
-    auto& drive_order = order->GetDriveOrders().at(order->GetProgressIndex());
+    auto drive_order =
+        transport_order_service_->ReadOrderDriveOrders(order_id).at(
+            transport_order_service_->ReadOrderProgressIndex(order_id));
 
     // Check if the drive_order can bypass :no need to move and no special
     // operation
@@ -68,8 +72,8 @@ void Phase2AssignNextDriveOrder::CheckForNextOrder(Vehicle* vehicle) {
   }
 }
 
-void Phase2AssignNextDriveOrder::SetOrderFinished(Vehicle* vehicle,
-                                                  TransportOrder* order) {
+void Phase2AssignNextDriveOrder::SetOrderFinished(const Vehicle* vehicle,
+                                                  const TransportOrder* order) {
   auto vehicle_id = vehicle->GetID();
   auto order_id = order->GetID();
 

@@ -17,10 +17,9 @@ class Path : public MapResource {
         destination_{destination},
         length_{length} {}
 
-  MapObjectID GetSource() { return source_; }
-  MapObjectID GetDestination() { return destination_; }
-  double GetLength() { return length_; }
-  void SetLength(double length) { length_ = length; }
+  MapObjectID GetSource() const { return source_; }
+  MapObjectID GetDestination() const { return destination_; }
+  double GetLength() const { return length_; }
 
  private:
   MapObjectID source_;

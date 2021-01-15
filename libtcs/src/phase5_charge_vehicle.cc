@@ -4,9 +4,8 @@ namespace tcs {
 
 void Phase5ChargeVehicle::Run() {
   // UNDONE!
-  return;
-
   BOOST_LOG_TRIVIAL(info) << "Phase 5: Charge low power vehicles...";
+  return;
 
   auto vehicles = vehicle_service_->FilterBy([](Vehicle* v) {
     return v->GetIntegrationLevel() == IntegrationLevel::kUtilized &&
@@ -31,20 +30,20 @@ void Phase5ChargeVehicle::Run() {
   }
 }
 
-void Phase5ChargeVehicle::CreateChargeOrder(Vehicle* vehicle) {
+void Phase5ChargeVehicle::CreateChargeOrder(const Vehicle* vehicle) {
   auto charge_location = map_service_->GetChargeLocation();
 
   auto order_id =
       order_pool_->AddOrder({{charge_location->GetID(), kChargeOperation}});
   auto order = order_pool_->GetOrder(order_id);
   auto drive_order = router_->GetRoute(
-      map_service_->GetPoint(vehicle->GetCurrentPoint().value()), order);
+      map_service_->GetPoint(
+          vehicle_service_->ReadVehicleCurrentPosition(vehicle->GetID())
+              .value()),
+      order);
   if (drive_order.has_value()) {
-    charge_location->ReservePoint(drive_order->back()
-                                      .GetRoute()
-                                      ->GetSteps()
-                                      .back()
-                                      .destination->GetID());
+    charge_location->ReservePoint(
+        drive_order->back().GetRoute()->GetSteps().back().destination->GetID());
     universal_dispatch_util_->AssignOrder(vehicle, order,
                                           std::move(drive_order));
   }

@@ -1,7 +1,11 @@
 #ifndef PHASE0_CHECK_NEW_ORDER_H
 #define PHASE0_CHECK_NEW_ORDER_H
 
+#include <boost/log/trivial.hpp>
+
 #include "tcs/dispatcher/phase.h"
+#include "tcs/router/irouter.h"
+#include "tcs/service/transport_order_service.h"
 
 namespace tcs {
 

@@ -4,7 +4,7 @@ namespace tcs {
 
 void DefaultScheduler::Claim(
     IVehicleController *vehicle,
-    std::vector<std::unordered_set<MapResource *>> resource_sequence) {
+    std::vector<std::unordered_set<const MapResource *>> resource_sequence) {
   std::scoped_lock<std::mutex> lock{scheduler_mut_};
   claims_by_vehicle_.insert(std::make_pair(vehicle, resource_sequence));
 }
@@ -14,14 +14,16 @@ void DefaultScheduler::Unclaim(IVehicleController *vehicle) {
   claims_by_vehicle_.erase(vehicle);
 }
 
-void DefaultScheduler::Allocate(IVehicleController *vehicle,
-                                std::unordered_set<MapResource *> resources) {
+void DefaultScheduler::Allocate(
+    IVehicleController *vehicle,
+    std::unordered_set<const MapResource *> resources) {
   executor_->Submit(&DefaultScheduler::AllocateTask, this, vehicle,
                     std::move(resources));
 }
 
 void DefaultScheduler::AllocateNow(
-    IVehicleController *vehicle, std::unordered_set<MapResource *> resources) {
+    IVehicleController *vehicle,
+    std::unordered_set<const MapResource *> resources) {
   std::scoped_lock<std::mutex> lock{scheduler_mut_};
   if (reservation_pool_.ResourcesAvailable(vehicle, resources)) {
     for (auto &resource : resources) {
@@ -34,7 +36,7 @@ void DefaultScheduler::AllocateNow(
 }
 
 void DefaultScheduler::Free(IVehicleController *vehicle,
-                            std::unordered_set<MapResource *> resources) {
+                            std::unordered_set<const MapResource *> resources) {
   // Free resources
   {
     std::scoped_lock<std::mutex> lock{scheduler_mut_};
@@ -57,7 +59,8 @@ void DefaultScheduler::FreeAll(IVehicleController *vehicle) {
 }
 
 void DefaultScheduler::AllocateTask(
-    IVehicleController *vehicle, std::unordered_set<MapResource *> resources) {
+    IVehicleController *vehicle,
+    std::unordered_set<const MapResource *> resources) {
   if (TryAllocate(vehicle, resources)) {
     CheckTask(vehicle, std::move(resources));
   } else {
@@ -72,8 +75,9 @@ void DefaultScheduler::AllocateTask(
   }
 }
 
-void DefaultScheduler::CheckTask(IVehicleController *vehicle,
-                                 std::unordered_set<MapResource *> resources) {
+void DefaultScheduler::CheckTask(
+    IVehicleController *vehicle,
+    std::unordered_set<const MapResource *> resources) {
   if (!vehicle->AllocationSuccessful(resources)) {
     BOOST_LOG_TRIVIAL(warning)
         << "Resources are refused by vehicle " << vehicle->GetVehicleID()
@@ -102,7 +106,8 @@ void DefaultScheduler::RetryTask() {
 }
 
 bool DefaultScheduler::TryAllocate(
-    IVehicleController *vehicle, std::unordered_set<MapResource *> &resources) {
+    IVehicleController *vehicle,
+    std::unordered_set<const MapResource *> &resources) {
   BOOST_LOG_TRIVIAL(debug) << "Try allocating for vehicle "
                            << vehicle->GetVehicleID();
   auto expanded_resources = ExpandBlocks(resources);
@@ -126,9 +131,9 @@ bool DefaultScheduler::TryAllocate(
     return false;
 }
 
-std::unordered_set<MapResource *> DefaultScheduler::ExpandBlocks(
-    std::unordered_set<MapResource *> &resources) {
-  std::unordered_set<MapResource *> expanded_resources{
+std::unordered_set<const MapResource *> DefaultScheduler::ExpandBlocks(
+    const std::unordered_set<const MapResource *> &resources) {
+  std::unordered_set<const MapResource *> expanded_resources{
       resources};  // Copy original set
   for (auto &resource : expanded_resources) {
     auto &blocks = resource->GetBlocks();

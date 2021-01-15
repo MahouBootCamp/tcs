@@ -15,63 +15,77 @@ class VehicleService {
   //   return vehicle_state_change_event_;
   // }
 
-  Event<Vehicle*, ProcessState, ProcessState>& VehicleProcessStateChangeEvent() {
+  Event<const Vehicle*, ProcessState, ProcessState>&
+  VehicleProcessStateChangeEvent() {
     return process_state_change_event_;
   }
 
-  Event<Vehicle*>& VehicleNeedChangeEvent() {
+  Event<const Vehicle*>& VehicleNeedChangeEvent() {
     return vehicle_need_change_event_;
   }
 
   template <class Predicate>
-  std::unordered_set<Vehicle*> FilterBy(Predicate p) {
-    std::unordered_set<Vehicle*> result;
+  std::unordered_set<const Vehicle*> FilterBy(Predicate p) const {
+    std::unordered_set<const Vehicle*> result;
     auto vehicles = map_->GetAllVehicles();
     for (auto& vehicle : vehicles) {
-      if (p(vehicle)) result.insert(vehicle);
+      if (p(const_cast<Vehicle*>(vehicle))) result.insert(vehicle);
     }
     return result;
   }
 
-  Vehicle* GetVehicle(MapObjectID id) { return map_->GetVehicle(id); }
+  const Vehicle* GetVehicle(MapObjectID id) const {
+    return map_->GetVehicle(id);
+  }
 
-  std::unordered_set<Vehicle*> GetAllVehicles() {
+  std::unordered_set<const Vehicle*> GetAllVehicles() {
     return map_->GetAllVehicles();
   }
 
-  std::unordered_set<Vehicle*> FilterVehiclesByState(VehicleState state) {
+  std::unordered_set<const Vehicle*> FilterVehiclesByState(
+      VehicleState state) const {
     return FilterBy(
         [&state](Vehicle* v) { return v->GetVehicleState() == state; });
   }
 
-  std::unordered_set<Vehicle*> FilterVehiclesByProcessState(
-      ProcessState state) {
+  std::unordered_set<const Vehicle*> FilterVehiclesByProcessState(
+      ProcessState state) const {
     return FilterBy(
         [&state](Vehicle* v) { return v->GetProcessState() == state; });
   }
 
+  IntegrationLevel ReadVehicleIntegrationLevel(MapObjectID vehicle_id) const;
+  void UpdateVehicleIntegrationLevel(MapObjectID vehicle_id, IntegrationLevel level);
+
+  VehicleState ReadVehicleState(MapObjectID vehicle_id) const;
   void UpdateVehicleState(MapObjectID vehicle_id, VehicleState state);
 
+  ProcessState ReadVehicleProcessState(MapObjectID vehicle_id) const;
   void UpdateVehicleProcessState(MapObjectID vehicle_id, ProcessState state);
 
+  TransportOrderRef ReadVehicleTransportOrder(MapObjectID vehicle_id) const;
   void UpdateVehicleTransportOrder(MapObjectID vehicle_id,
                                    TransportOrderRef order_ref);
 
+  MapObjectRef ReadVehicleCurrentPosition(MapObjectID vehicle_id) const;
   void UpdateVehicleCurrentPosition(MapObjectID vehicle_id,
                                     MapObjectRef point_ref);
 
+  std::size_t ReadVehicleRouteProgressIndex(MapObjectID vehicle_id) const;
   void UpdateVehicleRouteProgressIndex(MapObjectID vehicle_id,
                                        std::size_t index);
 
+  bool ReadVehicleNeedCharge(MapObjectID vehicle_id) const;
   void UpdateVehicleNeedCharge(MapObjectID vehicle_id, bool need_charge);
 
+  bool ReadVehicleFinishCharge(MapObjectID vehicle_id) const;
   void UpdateVehicleFinishCharge(MapObjectID vehicle_id, bool finish_charge);
 
  private:
   Map* map_;
   // Event<VehicleState, VehicleState> vehicle_state_change_event_;
-  Event<Vehicle*, ProcessState, ProcessState> process_state_change_event_;
-  Event<Vehicle*> vehicle_need_change_event_;
+  Event<const Vehicle*, ProcessState, ProcessState> process_state_change_event_;
+  Event<const Vehicle*> vehicle_need_change_event_;
 };
 
 }  // namespace tcs

@@ -19,7 +19,7 @@ namespace tcs {
 class DefaultController : public IVehicleController {
  public:
   // Controller would take over control of Adapter's lifecycle
-  DefaultController(Vehicle* vehicle, IVehicleAdapter* adapter,
+  DefaultController(const Vehicle* vehicle, IVehicleAdapter* adapter,
                     VehicleService* vehicle_service, IScheduler* scheduler);
 
   MapObjectID GetVehicleID() override { return vehicle_->GetID(); }
@@ -35,7 +35,7 @@ class DefaultController : public IVehicleController {
   void UpdateVehicleStateEventHandler(VehicleState state);
 
   bool AllocationSuccessful(
-      std::unordered_set<MapResource*> resources) override;
+      std::unordered_set<const MapResource*> resources) override;
 
   void AllocationFailed() override;
 
@@ -63,17 +63,18 @@ class DefaultController : public IVehicleController {
 
   // User sets initial position for vehicle.
   // Would allocate a point resource for it immediately
-  void InitPosition(MapResource* point) override;
+  void InitPosition(const MapResource* point) override;
 
  private:
-  std::vector<std::unordered_set<MapResource*>> ExpandDriveOrder(
+  std::vector<std::unordered_set<const MapResource*>> ExpandDriveOrder(
       DriveOrder& order);
 
   void CreateFutureCommands(DriveOrder& order);
 
   void AllocateForNextCommand();
 
-  std::unordered_set<MapResource*> ExpandMovementCommand(MovementCommand& cmd);
+  std::unordered_set<const MapResource*> ExpandMovementCommand(
+      MovementCommand& cmd);
 
   bool CanSendNextCommand() {
     return adapter_->CanEnqueueCommand() && command_queue_.size() > 0 &&
@@ -85,18 +86,18 @@ class DefaultController : public IVehicleController {
            !pending_command_.has_value();
   }
 
-  Vehicle* vehicle_;
+  const Vehicle* vehicle_;
   std::unique_ptr<IVehicleAdapter> adapter_;
   VehicleService* vehicle_service_;
   IScheduler* scheduler_;
-  
+
   std::optional<DriveOrder> current_drive_order_ = std::nullopt;
   std::list<MovementCommand> command_queue_;
   std::list<MovementCommand> command_sent_;
   std::optional<MovementCommand> pending_command_;
-  std::unordered_set<MapResource*> pending_resources_;
+  std::unordered_set<const MapResource*> pending_resources_;
   bool waiting_for_allocation_ = false;
-  std::list<std::unordered_set<MapResource*>> allocated_resources_;
+  std::list<std::unordered_set<const MapResource*>> allocated_resources_;
   mutable std::mutex vehicle_mut_;
 };
 

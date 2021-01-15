@@ -25,7 +25,7 @@ class Phase3AssignReservedOrder : public Phase {
   void Run() override;
 
  private:
-  void CheckForReservedOrder(Vehicle* vehicle);
+  void CheckForReservedOrder(const Vehicle* vehicle);
 
   MapService* map_service_;
   VehicleService* vehicle_service_;

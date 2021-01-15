@@ -24,7 +24,7 @@ class Phase5ChargeVehicle : public Phase {
   void Run() override;
 
  private:
-  void CreateChargeOrder(Vehicle* vehicle);
+  void CreateChargeOrder(const Vehicle* vehicle);
 
   OrderPool* order_pool_;
   MapService* map_service_;

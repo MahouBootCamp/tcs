@@ -11,12 +11,10 @@ namespace tcs {
 
 class IScheduler {
  public:
-  // NOTE: The first three functions are meaningless tbh.
-
   // Claim a sequence of resources for a vehicle
-  virtual void Claim(
-      IVehicleController* vehicle,
-      std::vector<std::unordered_set<MapResource*>> resource_sequence) = 0;
+  virtual void Claim(IVehicleController* vehicle,
+                     std::vector<std::unordered_set<const MapResource*>>
+                         resource_sequence) = 0;
   // Unclaim resources for a vehicle
   virtual void Unclaim(IVehicleController* vehicle) = 0;
   // Notify scheduler of a vehicle's progress. Resources in sequence before
@@ -27,14 +25,15 @@ class IScheduler {
   // Allocate resources for vehicle. A MapResource can only be reserved for one
   // vehicle at the same time.
   virtual void Allocate(IVehicleController* vehicle,
-                        std::unordered_set<MapResource*> resources) = 0;
+                        std::unordered_set<const MapResource*> resources) = 0;
   // Allocate resources for vehicle without blocking.
   // NOTE: This function is for manual control or emergency.
-  virtual void AllocateNow(IVehicleController* vehicle,
-                           std::unordered_set<MapResource*> resources) = 0;
+  virtual void AllocateNow(
+      IVehicleController* vehicle,
+      std::unordered_set<const MapResource*> resources) = 0;
   // Free specified resources
   virtual void Free(IVehicleController* vehicle,
-                    std::unordered_set<MapResource*> resources) = 0;
+                    std::unordered_set<const MapResource*> resources) = 0;
   // Free resources allocated for vehicle
   virtual void FreeAll(IVehicleController* vehicle) = 0;
   virtual ~IScheduler() {}

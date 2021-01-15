@@ -15,7 +15,7 @@ class IVehicleController {
  public:
   virtual MapObjectID GetVehicleID() = 0;
   // Called by scheduler
-  virtual bool AllocationSuccessful(std::unordered_set<MapResource*> resources) = 0;
+  virtual bool AllocationSuccessful(std::unordered_set<const MapResource*> resources) = 0;
   // Called by scheduler
   virtual void AllocationFailed() = 0;
   virtual void SetDriveOrder(DriveOrder order) = 0;
@@ -24,7 +24,7 @@ class IVehicleController {
   virtual void AbortDriveOrder(bool immediately) = 0;
   // virtual void ClearCommandQueue() = 0;
   virtual bool CanProcess(std::unordered_set<std::string> operations) = 0;
-  virtual void InitPosition(MapResource* point) = 0;
+  virtual void InitPosition(const MapResource* point) = 0;
   // TODO: Add a get movement command queue function
 
   // virtual void OnUpdatePositionEvent() = 0;

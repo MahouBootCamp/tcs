@@ -2,7 +2,8 @@
 
 namespace tcs {
 
-ReservationEntry &ReservationPool::GetReservationEntry(MapResource *resource) {
+ReservationEntry &ReservationPool::GetReservationEntry(
+    const MapResource *resource) {
   auto itr = reservation_pool_.find(resource);
   if (itr == reservation_pool_.end()) {
     // Create an empty entry for resource
@@ -14,9 +15,9 @@ ReservationEntry &ReservationPool::GetReservationEntry(MapResource *resource) {
   }
 }
 
-std::unordered_set<MapResource *> ReservationPool::GetAllocatedResources(
+std::unordered_set<const MapResource *> ReservationPool::GetAllocatedResources(
     IVehicleController *vehicle) {
-  std::unordered_set<MapResource *> res;
+  std::unordered_set<const MapResource *> res;
   for (auto &entry : reservation_pool_) {
     if (entry.second.vehicle == vehicle) res.insert(entry.first);
   }
@@ -24,7 +25,8 @@ std::unordered_set<MapResource *> ReservationPool::GetAllocatedResources(
 }
 
 bool ReservationPool::ResourcesAvailable(
-    IVehicleController *vehicle, std::unordered_set<MapResource *> &resources) {
+    IVehicleController *vehicle,
+    std::unordered_set<const MapResource *> &resources) {
   for (auto &resource : resources) {
     auto &entry = GetReservationEntry(resource);
     if (entry.count != 0 && entry.vehicle != vehicle) return false;
@@ -33,7 +35,7 @@ bool ReservationPool::ResourcesAvailable(
 }
 
 void ReservationPool::Free(IVehicleController *vehicle,
-                           std::unordered_set<MapResource *> &resources) {
+                           std::unordered_set<const MapResource *> &resources) {
   auto freeable_resources = GetFreeableResources(vehicle, resources);
   for (auto &resource : freeable_resources) {
     auto &entry = GetReservationEntry(resource);
@@ -53,10 +55,10 @@ void ReservationPool::FreeAll(IVehicleController *vehicle) {
   }
 }
 
-std::unordered_set<MapResource *>
+std::unordered_set<const MapResource *>
 ReservationPool::FilterCompletelyFreeResources(
-    std::unordered_set<MapResource *> &resources) {
-  std::unordered_set<MapResource *> res;
+    const std::unordered_set<const MapResource *> &resources) {
+  std::unordered_set<const MapResource *> res;
   for (auto &resource : resources) {
     auto &entry = GetReservationEntry(resource);
     if (entry.vehicle == nullptr && entry.count == 0) res.insert(resource);
@@ -64,17 +66,18 @@ ReservationPool::FilterCompletelyFreeResources(
   return res;
 }
 
-std::unordered_set<MapResource *> ReservationPool::GetFreeableResources(
-    IVehicleController *vehicle, std::unordered_set<MapResource *> &resources) {
-  std::unordered_set<MapResource *> res;
+std::unordered_set<const MapResource *> ReservationPool::GetFreeableResources(
+    IVehicleController *vehicle,
+    const std::unordered_set<const MapResource *> &resources) {
+  std::unordered_set<const MapResource *> res;
   for (auto &resource : resources) {
     auto &entry = GetReservationEntry(resource);
     if (entry.vehicle == vehicle)
       res.insert(resource);
     else
-      BOOST_LOG_TRIVIAL(warning)
-          << "Freeing resource " << resource->GetID()
-          << " which is not reserved for vehicle " << entry.vehicle->GetVehicleID();
+      BOOST_LOG_TRIVIAL(warning) << "Freeing resource " << resource->GetID()
+                                 << " which is not reserved for vehicle "
+                                 << entry.vehicle->GetVehicleID();
   }
   return res;
 }

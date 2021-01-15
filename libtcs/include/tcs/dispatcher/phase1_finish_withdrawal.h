@@ -1,7 +1,13 @@
 #ifndef PHASE1_FINISH_WITHDRAWAL_H
 #define PHASE1_FINISH_WITHDRAWAL_H
 
+#include <boost/log/trivial.hpp>
+
 #include "tcs/dispatcher/phase.h"
+#include "tcs/router/irouter.h"
+#include "tcs/service/map_service.h"
+#include "tcs/service/transport_order_service.h"
+#include "tcs/service/vehicle_service.h"
 
 namespace tcs {
 
@@ -18,7 +24,7 @@ class Phase1FinishWithdrawal : public Phase {
   void Run() override;
 
  private:
-  void FinishWithDrawal(Vehicle* vehicle, TransportOrder* order);
+  void FinishWithDrawal(const Vehicle* vehicle, const TransportOrder* order);
 
   MapService* map_service_;
   VehicleService* vehicle_service_;
