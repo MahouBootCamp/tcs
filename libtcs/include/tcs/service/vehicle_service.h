@@ -9,7 +9,8 @@ namespace tcs {
 
 class VehicleService {
  public:
-  VehicleService(Map* map) : map_{map} {}
+  VehicleService(Map* map, std::recursive_mutex& global_mutex)
+      : map_{map}, global_mutex_{global_mutex} {}
 
   // Event<VehicleState, VehicleState>& VehicleStateChangeEvent() {
   //   return vehicle_state_change_event_;
@@ -26,6 +27,7 @@ class VehicleService {
 
   template <class Predicate>
   std::unordered_set<const Vehicle*> FilterBy(Predicate p) const {
+    std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
     std::unordered_set<const Vehicle*> result;
     auto vehicles = map_->GetAllVehicles();
     for (auto& vehicle : vehicles) {
@@ -55,7 +57,8 @@ class VehicleService {
   }
 
   IntegrationLevel ReadVehicleIntegrationLevel(MapObjectID vehicle_id) const;
-  void UpdateVehicleIntegrationLevel(MapObjectID vehicle_id, IntegrationLevel level);
+  void UpdateVehicleIntegrationLevel(MapObjectID vehicle_id,
+                                     IntegrationLevel level);
 
   VehicleState ReadVehicleState(MapObjectID vehicle_id) const;
   void UpdateVehicleState(MapObjectID vehicle_id, VehicleState state);
@@ -83,6 +86,7 @@ class VehicleService {
 
  private:
   Map* map_;
+  std::recursive_mutex& global_mutex_;
   // Event<VehicleState, VehicleState> vehicle_state_change_event_;
   Event<const Vehicle*, ProcessState, ProcessState> process_state_change_event_;
   Event<const Vehicle*> vehicle_need_change_event_;

@@ -32,10 +32,10 @@ class Kernal : public IKernal {
       : executor_{std::make_unique<Executor>(kExecutorThreads)},
         map_{map},
         order_pool_{std::make_unique<OrderPool>(map)},
-        map_service_{std::make_unique<MapService>(map)},
-        vehicle_service_{std::make_unique<VehicleService>(map)},
-        transport_order_service_{
-            std::make_unique<TransportOrderService>(order_pool_.get())},
+        map_service_{std::make_unique<MapService>(map, global_mutex_)},
+        vehicle_service_{std::make_unique<VehicleService>(map, global_mutex_)},
+        transport_order_service_{std::make_unique<TransportOrderService>(
+            order_pool_.get(), global_mutex_)},
         router_{std::make_unique<DefaultRouter>(
             map_service_.get(), transport_order_service_.get())},
         scheduler_{std::make_unique<DefaultScheduler>(executor_.get(),

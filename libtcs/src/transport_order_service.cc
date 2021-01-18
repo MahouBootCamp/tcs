@@ -4,6 +4,7 @@ namespace tcs {
 
 bool TransportOrderService::HasUnfinishedDependencies(
     TransportOrderID order_id) {
+  std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
   auto order = GetTransportOrder(order_id);
   auto& dependencies = order->GetDependencies();
   for (auto& dependency_id : dependencies) {
@@ -14,11 +15,13 @@ bool TransportOrderService::HasUnfinishedDependencies(
 
 TransportOrderState TransportOrderService::ReadOrderState(
     TransportOrderID order_id) const {
+  std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
   return order_pool_->GetOrder(order_id)->GetState();
 }
 
 void TransportOrderService::UpdateOrderState(TransportOrderID order_id,
                                              TransportOrderState state) {
+  std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
   auto order = order_pool_->GetOrder(order_id);
   auto old_state = order->GetState();
   order->SetState(state);
@@ -27,33 +30,39 @@ void TransportOrderService::UpdateOrderState(TransportOrderID order_id,
 
 std::size_t TransportOrderService::ReadOrderProgressIndex(
     TransportOrderID order_id) const {
+  std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
   return order_pool_->GetOrder(order_id)->GetProgressIndex();
 }
 
 std::vector<DriveOrder> TransportOrderService::ReadOrderFutureDriveOrders(
     TransportOrderID order_id) const {
+  std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
   return order_pool_->GetOrder(order_id)->GetFutureDriveOrders();
 }
 
 void TransportOrderService::UpdateOrderNextDriveOrder(
     TransportOrderID order_id) {
+  std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
   auto order = order_pool_->GetOrder(order_id);
   order->SetProgressIndex(order->GetProgressIndex() + 1);
 }
 
 std::vector<DriveOrder> TransportOrderService::ReadOrderDriveOrders(
     TransportOrderID order_id) const {
+  std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
   return order_pool_->GetOrder(order_id)->GetDriveOrders();
 }
 
 MapObjectRef TransportOrderService::ReadOrderVehicle(
     TransportOrderID order_id) const {
+  std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
   return order_pool_->GetOrder(order_id)->GetVehicle();
 }
 
 void TransportOrderService::UpdateOrderVehicleAndDriveOrder(
     TransportOrderID order_id, MapObjectRef vehicle_ref,
     std::optional<std::vector<DriveOrder> > drive_orders) {
+  std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
   auto order = order_pool_->GetOrder(order_id);
   order->SetVehicle(vehicle_ref);
   if (drive_orders.has_value()) {

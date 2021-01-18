@@ -49,14 +49,15 @@ class RouterTest : public ::testing::Test {
  protected:
   RouterTest()
       : map_{BuildRouterTestMap()},
-        map_service_{make_unique<MapService>(map_.get())} {}
+        map_service_{make_unique<MapService>(map_.get(), mutex_)} {}
   void SetUp() override {
     order_pool_.reset(new OrderPool{map_.get()});
     transport_order_service_.reset(
-        new TransportOrderService{order_pool_.get()});
+        new TransportOrderService{order_pool_.get(), mutex_});
     router_.reset(
         new DefaultRouter{map_service_.get(), transport_order_service_.get()});
   }
+  std::recursive_mutex mutex_;
   unique_ptr<Map> map_;
   unique_ptr<MapService> map_service_;
   unique_ptr<OrderPool> order_pool_;

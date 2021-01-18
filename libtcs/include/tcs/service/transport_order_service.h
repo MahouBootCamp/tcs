@@ -9,7 +9,9 @@ namespace tcs {
 
 class TransportOrderService {
  public:
-  TransportOrderService(OrderPool* order_pool) : order_pool_{order_pool} {}
+  TransportOrderService(OrderPool* order_pool,
+                        std::recursive_mutex& global_mutex)
+      : order_pool_{order_pool}, global_mutex_{global_mutex} {}
 
   Event<const TransportOrder*, TransportOrderState, TransportOrderState>&
   OrderStateChangeEvent() {
@@ -18,6 +20,7 @@ class TransportOrderService {
 
   template <class Predicate>
   std::unordered_set<const TransportOrder*> FilterBy(Predicate p) const {
+    std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
     std::unordered_set<const TransportOrder*> result;
     auto orders = order_pool_->GetAllOrders();
     for (auto& order : orders) {
@@ -51,8 +54,7 @@ class TransportOrderService {
       TransportOrderID order_id) const;
   void UpdateOrderNextDriveOrder(TransportOrderID order_id);
 
-  std::vector<DriveOrder> ReadOrderDriveOrders(
-      TransportOrderID order_id) const;
+  std::vector<DriveOrder> ReadOrderDriveOrders(TransportOrderID order_id) const;
   MapObjectRef ReadOrderVehicle(TransportOrderID order_id) const;
   // Since the vehicle and driveorder would be decided at the same time, they
   // are set in one function
@@ -61,9 +63,10 @@ class TransportOrderService {
       std::optional<std::vector<DriveOrder>> drive_orders);
 
  private:
+  OrderPool* order_pool_;
+  std::recursive_mutex& global_mutex_;
   Event<const TransportOrder*, TransportOrderState, TransportOrderState>
       order_state_change_event_;
-  OrderPool* order_pool_;
 };
 
 }  // namespace tcs
