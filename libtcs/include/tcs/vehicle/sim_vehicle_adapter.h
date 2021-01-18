@@ -11,7 +11,7 @@ namespace tcs {
 
 const std::size_t kMaxCommandQueueSize = 2;
 const double kSimSpeed = 100;        // mm/s
-const long kSimOperation = 1;        // s
+const long kSimOperation = 3;        // s
 const long kSimChargeOperation = 5;  // s
 const std::string kLoadOperation = "Load";
 const std::string kUnloadOperation = "Unload";

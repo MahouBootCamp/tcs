@@ -75,8 +75,8 @@ void SimVehicleAdapter::SimulateTasks() {
         UpdatePositionEvent().Fire(cmd.step.destination->GetID());
 
         // Sim operation
-        BOOST_LOG_TRIVIAL(debug) << "Simulating operation: " << cmd.operation;
         if (cmd.operation != kNoOperation) {
+          BOOST_LOG_TRIVIAL(debug) << "Simulating operation: " << cmd.operation;
           if (cmd.operation == kChargeOperation) {
             UpdateVehicleStateEvent().Fire(VehicleState::kCharging);
             cnt_ = 0;

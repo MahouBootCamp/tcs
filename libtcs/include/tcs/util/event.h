@@ -50,10 +50,11 @@ class Event {
 
  private:
   void CheckStatus() {
+    auto& fut = futures_.front();
     for (auto i = futures_.begin(); i != futures_.end();) {
       if (!i->valid() || i->wait_for(std::chrono::nanoseconds(1)) ==
                              std::future_status::ready) {
-        futures_.erase(i);
+        i = futures_.erase(i);
       } else
         ++i;
     }

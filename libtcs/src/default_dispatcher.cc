@@ -50,7 +50,6 @@ DefaultDispatcher::DefaultDispatcher(
 }
 
 void DefaultDispatcher::Dispatch() {
-  BOOST_LOG_TRIVIAL(info) << "Scheduling dispatch task...";
   executor_->Submit(&DefaultDispatcher::DispatchTask, this);
 }
 
@@ -93,17 +92,20 @@ void DefaultDispatcher::VehicleProcessStateChangeEventHandler(
       IntegrationLevel::kUtilized) {
     if (old_state != new_state && (new_state == ProcessState::kAwaitingOrder ||
                                    new_state == ProcessState::kIdle))
-      Dispatch();
+      BOOST_LOG_TRIVIAL(debug)
+          << "Dispatch due to vehicle proccess state change";
+    Dispatch();
   }
 }
 
 void DefaultDispatcher::VehicleNeedChargeEventHandler(const Vehicle* vehicle) {
   auto vehicle_id = vehicle->GetID();
-  if (vehicle_service_->ReadVehicleIntegrationLevel(vehicle_id) ==
-          IntegrationLevel::kUtilized &&
-      vehicle_service_->ReadVehicleNeedCharge(vehicle_id)) {
-    Dispatch();
-  }
+  // if (vehicle_service_->ReadVehicleIntegrationLevel(vehicle_id) ==
+  //         IntegrationLevel::kUtilized &&
+  //     vehicle_service_->ReadVehicleNeedCharge(vehicle_id)) {
+  //   BOOST_LOG_TRIVIAL(debug) << "Dispatch due to vehicle need charge";
+  //   Dispatch();
+  // }
 }
 
 }  // namespace tcs

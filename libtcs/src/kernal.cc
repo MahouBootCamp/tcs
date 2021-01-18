@@ -21,6 +21,7 @@ void Kernal::Start() {
     while (quit_fut_.valid()) {
       if (quit_fut_.wait_for(std::chrono::seconds(kDispatchCycle)) ==
           std::future_status::timeout) {
+        BOOST_LOG_TRIVIAL(debug) << "Dispatch periodically";
         dispatcher_->Dispatch();
       } else
         break;
@@ -60,6 +61,7 @@ TransportOrderID Kernal::AddTransportOrder(
     throw std::runtime_error("Cannot add order while kernal is not operating!");
 
   auto order_id = order_pool_->AddOrder(destinations, dependencies);
+  BOOST_LOG_TRIVIAL(debug) << "Dispatch due to new order";
   dispatcher_->Dispatch();
   return order_id;
 }

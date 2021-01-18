@@ -29,10 +29,16 @@ DefaultController::DefaultController(const Vehicle* vehicle,
 }
 
 void DefaultController::UpdatePositionEventHandler(MapObjectRef point_ref) {
+  if (point_ref.has_value()) {
+    BOOST_LOG_TRIVIAL(debug)
+        << "Vehicle " << vehicle_->GetID() << " arriving " << point_ref.value();
+  }
   vehicle_service_->UpdateVehicleCurrentPosition(vehicle_->GetID(), point_ref);
 }
 
 void DefaultController::FinishCommandEventHandler(MovementCommand cmd) {
+  BOOST_LOG_TRIVIAL(debug) << "Vehicle " << vehicle_->GetID()
+                           << " finished a movement command";
   std::scoped_lock<std::mutex> lock{vehicle_mut_};
   auto cmd_sent = std::move(command_sent_.front());
   command_sent_.pop_front();
@@ -79,6 +85,8 @@ void DefaultController::UpdateVehicleStateEventHandler(VehicleState state) {
 
 bool DefaultController::AllocationSuccessful(
     std::unordered_set<const MapResource*> resources) {
+  BOOST_LOG_TRIVIAL(debug) << "Allocation for vehicle " << vehicle_->GetID()
+                           << " succeeded";
   std::scoped_lock<std::mutex> lock{vehicle_mut_};
   if (pending_resources_ != resources) return false;
 
@@ -106,9 +114,9 @@ void DefaultController::AllocationFailed() {
 void DefaultController::SetDriveOrder(DriveOrder order) {
   std::scoped_lock<std::mutex> lock{vehicle_mut_};
   if (current_drive_order_.has_value())
-    throw std::runtime_error("vehicle " + std::to_string(vehicle_->GetID()) +
+    throw std::runtime_error("Vehicle " + std::to_string(vehicle_->GetID()) +
                              " already has an order");
-  BOOST_LOG_TRIVIAL(debug) << "vehicle " << vehicle_->GetID()
+  BOOST_LOG_TRIVIAL(debug) << "Vehicle " << vehicle_->GetID()
                            << " setting driveorder";
   scheduler_->Claim(this, ExpandDriveOrder(order));
   current_drive_order_ = order;
@@ -141,6 +149,8 @@ void DefaultController::AbortDriveOrder(bool immediately) {
     allocated_resources_.push_back(current_resources);
 
   } else {
+    BOOST_LOG_TRIVIAL(debug)
+        << "Vehicle " << vehicle_->GetID() << " aborting driveorder";
     if (current_drive_order_.has_value()) command_queue_.clear();
   }
 }

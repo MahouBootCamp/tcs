@@ -19,6 +19,13 @@ TransportOrderID OrderPool::AddOrder(
     auto site = map_->GetResource(dst.site);
     if (!site || site->GetType() == MapObjectType::kPath)
       throw std::invalid_argument("Destination invalid");
+    if (site->GetType() == MapObjectType::kPoint &&
+        dst.operation != kNoOperation)
+      throw std::invalid_argument("Operation at points");
+    if (site->GetType() == MapObjectType::kLocation &&
+        map_->GetLocation(dst.site)->GetOperations().find(dst.operation) ==
+            map_->GetLocation(dst.site)->GetOperations().end())
+      throw std::invalid_argument("Operation not supported");
   }
 
   for (auto& transport_order : dependencies) {

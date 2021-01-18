@@ -49,7 +49,7 @@ void SimVehicleAdapterTest() {
   adapter.Enable();
   adapter.EnqueueCommand({step0, "Load", false});
   adapter.EnqueueCommand({step1, "Unload", true});
-  std::this_thread::sleep_for(std::chrono::seconds(5));
+  std::this_thread::sleep_for(std::chrono::seconds(25));
   adapter.Disable();
 }
 

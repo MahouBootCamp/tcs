@@ -93,11 +93,11 @@ void DefaultScheduler::CheckTask(
 
 void DefaultScheduler::RetryTask() {
   // Take cached allocations out & reset cache
-  std::unique_lock<std::mutex> lock{scheduler_mut_};
-  lock.lock();
+  BOOST_LOG_TRIVIAL(debug) << "Retry deferred allocations";
+  std::scoped_lock<std::mutex> lock{scheduler_mut_};
+
   auto deferred_allocations_move = std::move(deferred_allocations_);
   deferred_allocations_ = {};
-  lock.unlock();
 
   for (auto &pair : deferred_allocations_move) {
     executor_->Submit(&DefaultScheduler::AllocateTask, this, pair.first,
