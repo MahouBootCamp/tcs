@@ -88,7 +88,7 @@ Phase4AssignFreeOrder::FilterDispatchableTransportOrders() {
 //     BOOST_LOG_TRIVIAL(debug)
 //         << "Reserving order " << order_id << " to vehicle " << vehicle_id;
 //     auto controller = controller_pool_->GetController(vehicle_id);
-//     // UNDONE: Abort the transport order
+//
 //     // controller->AbortDriveOrder(false);
 //     reserve_order_pool_->AddReservation(order_id, vehicle_id);
 //   } else {

@@ -16,16 +16,20 @@ void UniversalDispatchUtil::AssignOrder(
     std::optional<std::vector<DriveOrder> > drive_orders) {
   auto vehicle_id = vehicle->GetID();
   auto order_id = order->GetID();
+  auto cuurent_order = vehicle_service_->ReadVehicleTransportOrder(vehicle_id);
   if (vehicle_service_->ReadVehicleTransportOrder(vehicle_id).has_value()) {
     // If has dispensable order, abort it and reserve new order to wait for
     // abortion.
-    BOOST_LOG_TRIVIAL(debug)
-        << "Reserving order " << order_id << " to vehicle " << vehicle_id;
-    auto controller = controller_pool_->GetController(vehicle_id);
-    // UNDONE: Abort order
-    // controller->AbortDriveOrder(false);
-
-    reserve_order_pool_->AddReservation(order_id, vehicle_id);
+    if (transport_order_service_->GetTransportOrder(cuurent_order.value())
+            ->GetDispensable()) {
+      BOOST_LOG_TRIVIAL(debug)
+          << "Reserving order " << order_id << " to vehicle " << vehicle_id;
+      auto controller = controller_pool_->GetController(vehicle_id);
+      controller->AbortDriveOrder(false);
+      reserve_order_pool_->AddReservation(order_id, vehicle_id);
+    } else {
+      throw std::runtime_error("Assigning order to busy vehicle!");
+    }
   } else {
     // Assign it directly
     BOOST_LOG_TRIVIAL(debug)

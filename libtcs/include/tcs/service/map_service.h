@@ -8,7 +8,6 @@
 
 namespace tcs {
 
-// TODO: Add multiprocess protection
 class MapService {
  public:
   MapService(Map* map, std::recursive_mutex& global_mutex)

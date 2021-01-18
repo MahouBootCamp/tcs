@@ -12,7 +12,6 @@
 
 namespace tcs {
 
-// TODO: Add multithread protection
 class DefaultScheduler : public IScheduler {
  public:
   DefaultScheduler(Executor *executor, MapService *map_service)

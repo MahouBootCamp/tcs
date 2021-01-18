@@ -25,7 +25,7 @@ class ControllerPool {
                                IVehicleAdapter* adapter = nullptr);
 
   // Detach a vehicle.
-  // NOTE: Not implemented.
+  // UNDONE: Not implemented.
   void DetachVehicleController(MapObjectID vehicle);
 
   IVehicleController* GetController(MapObjectID vehicle);

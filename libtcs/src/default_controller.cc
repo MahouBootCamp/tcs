@@ -145,7 +145,7 @@ void DefaultController::AbortDriveOrder(bool immediately) {
   }
 }
 
-void DefaultController::InitPosition(const MapResource* point) {
+void DefaultController::InitPosition(const Point* point) {
   scheduler_->AllocateNow(this, {point});
   vehicle_service_->UpdateVehicleCurrentPosition(vehicle_->GetID(),
                                                  point->GetID());

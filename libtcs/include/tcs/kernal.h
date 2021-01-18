@@ -25,6 +25,7 @@
 namespace tcs {
 
 const std::size_t kExecutorThreads = 1;
+const int kDispatchCycle = 10;  // second
 
 class Kernal : public IKernal {
  public:
@@ -54,13 +55,14 @@ class Kernal : public IKernal {
 
   void Exit() override;
 
-  void EnableVehicle() override;
+  void EnableVehicle(MapObjectID vehicle, MapObjectID initial_position,
+                     IVehicleAdapter* adapter = nullptr) override;
 
   TransportOrderID AddTransportOrder(
       std::vector<Destination> destinations,
       std::unordered_set<TransportOrderID> dependencies = {}) override;
 
-  void WithdrawTransportOrder(TransportOrderID id, bool immediate) override;
+  void WithdrawTransportOrder(TransportOrderID id) override;
 
   // NOTE: Following functions are for test only
   Executor* GetExecutor() { return executor_.get(); }

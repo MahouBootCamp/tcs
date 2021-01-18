@@ -15,7 +15,6 @@
 
 namespace tcs {
 
-// TODO: Add multithread protection
 class DefaultController : public IVehicleController {
  public:
   // Controller would take over control of Adapter's lifecycle
@@ -63,7 +62,7 @@ class DefaultController : public IVehicleController {
 
   // User sets initial position for vehicle.
   // Would allocate a point resource for it immediately
-  void InitPosition(const MapResource* point) override;
+  void InitPosition(const Point* point) override;
 
  private:
   std::vector<std::unordered_set<const MapResource*>> ExpandDriveOrder(

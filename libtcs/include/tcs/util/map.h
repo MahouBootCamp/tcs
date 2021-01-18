@@ -15,8 +15,6 @@
 namespace tcs {
 
 // A Map manages all MapObjcets
-// REVIEW: Wrap it with a service class and add concurrent protection?
-// TODO: add trigger events for dispatch.
 class Map {
   friend class MapBuilder;
 

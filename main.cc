@@ -43,8 +43,6 @@ int main(int, char**) {
   // Create transport orders
   // Exit
 
-  // TODO: Tighten const check on whole project
-
   auto map = BuildTestMap();
 
   std::unique_ptr<tcs::IKernal> kernal = std::make_unique<tcs::Kernal>(map);

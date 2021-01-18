@@ -14,7 +14,6 @@ namespace tcs {
 
 class DefaultRouter : public IRouter {
  public:
-  // REVIEW: Use map service instead of map pointer?
   DefaultRouter(MapService *map_service,
                 TransportOrderService *transport_order_service)
       : map_service_{map_service},

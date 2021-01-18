@@ -23,11 +23,8 @@
 
 namespace tcs {
 
-// TODO: multithread protection.
-// TODO: add trigger events for dispatch.
 class DefaultDispatcher : public IDispatcher {
  public:
-  // TODO: Imcomplete constructor
   DefaultDispatcher(Executor* executor, OrderPool* order_pool,
                     MapService* map_service, VehicleService* vehicle_service,
                     TransportOrderService* transport_order_service,
@@ -58,7 +55,6 @@ class DefaultDispatcher : public IDispatcher {
   std::unique_ptr<ReserveOrderPool> reserve_order_pool_;
   std::unique_ptr<UniversalDispatchUtil> universal_dispatch_util_;
 
-  // TODO: Add constructors for all phases
   Phase0CheckNewOrder phase0_;
   Phase1FinishWithdrawal phase1_;
   Phase2AssignNextDriveOrder phase2_;

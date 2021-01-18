@@ -24,8 +24,7 @@ class IVehicleController {
   virtual void AbortDriveOrder(bool immediately) = 0;
   // virtual void ClearCommandQueue() = 0;
   virtual bool CanProcess(std::unordered_set<std::string> operations) = 0;
-  virtual void InitPosition(const MapResource* point) = 0;
-  // TODO: Add a get movement command queue function
+  virtual void InitPosition(const Point* point) = 0;
 
   // virtual void OnUpdatePositionEvent() = 0;
   // virtual void OnFinishCommandEvent() = 0;
