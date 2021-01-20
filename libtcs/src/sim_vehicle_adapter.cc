@@ -67,11 +67,11 @@ void SimVehicleAdapter::SimulateTasks() {
         BOOST_LOG_TRIVIAL(debug)
             << "Simulating movement from " << cmd.step.source->GetID()
             << " towards " << cmd.step.destination->GetID();
-        // double time_cost = cmd.step.path->GetLength() / kSimSpeed * 1000;
-        // std::this_thread::sleep_for(
-        //     std::chrono::milliseconds(long(round(time_cost))));
+
         UpdateVehicleStateEvent().Fire(VehicleState::kExecuting);
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        double time_cost = cmd.step.path->GetLength() / kSimSpeed * 1000;
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(long(round(time_cost))));
         UpdatePositionEvent().Fire(cmd.step.destination->GetID());
 
         // Sim operation

@@ -6,15 +6,15 @@ void Phase4AssignFreeOrder::Run() {
   BOOST_LOG_TRIVIAL(info) << "Phase 4: Assign Free Order...";
   auto vehicles = FilterAvailableVehicles();
   if (vehicles.empty()) {
-    BOOST_LOG_TRIVIAL(info) << "No vehicles available for dispatching, "
-                               "skipping assign free order phase";
+    // BOOST_LOG_TRIVIAL(info) << "No vehicles available for dispatching, "
+    //                            "skipping assign free order phase";
     return;
   }
 
   auto orders = FilterDispatchableTransportOrders();
   if (orders.empty()) {
-    BOOST_LOG_TRIVIAL(info) << "No new orders need dispatching, "
-                               "skipping assign free order phase";
+    // BOOST_LOG_TRIVIAL(info) << "No new orders need dispatching, "
+    //                            "skipping assign free order phase";
     return;
   }
 

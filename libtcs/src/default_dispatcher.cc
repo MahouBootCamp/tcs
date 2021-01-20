@@ -93,7 +93,7 @@ void DefaultDispatcher::VehicleProcessStateChangeEventHandler(
     if (old_state != new_state && (new_state == ProcessState::kAwaitingOrder ||
                                    new_state == ProcessState::kIdle))
       BOOST_LOG_TRIVIAL(debug)
-          << "Dispatch due to vehicle proccess state change";
+          << "Dispatch on vehicle proccess state change";
     Dispatch();
   }
 }
