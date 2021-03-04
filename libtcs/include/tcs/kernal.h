@@ -24,8 +24,8 @@
 
 namespace tcs {
 
-const std::size_t kExecutorThreads = 1;
-const int kDispatchCycle = 10;  // second
+constexpr std::size_t kExecutorThreads = 1;
+constexpr int kDispatchCycle = 10;  // second
 
 class Kernal : public IKernal {
  public:
