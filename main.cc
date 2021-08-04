@@ -1,5 +1,5 @@
 #include "sim_vehicle_adapter_test.h"
-#include "tcs/kernal.h"
+#include "tcs/kernel.h"
 #include "tcs/util/map_builder.h"
 
 tcs::Map* BuildTestMap() {
@@ -35,19 +35,19 @@ tcs::Map* BuildTestMap() {
 
 int main(int, char**) {
   auto map = BuildTestMap();
-  std::unique_ptr<tcs::IKernal> kernal = std::make_unique<tcs::Kernal>(map);
+  std::unique_ptr<tcs::IKernel> kernel = std::make_unique<tcs::Kernel>(map);
 
-  kernal->EnableVehicle(18, 2);
-  kernal->EnableVehicle(19, 3);
-  kernal->Start();
-  kernal->AddTransportOrder({{15, tcs::kLoadOperation},
+  kernel->EnableVehicle(18, 2);
+  kernel->EnableVehicle(19, 3);
+  kernel->Start();
+  kernel->AddTransportOrder({{15, tcs::kLoadOperation},
                              {16, tcs::kUnloadOperation},
                              {17, tcs::kParkOperation}});
-  kernal->AddTransportOrder({{15, tcs::kLoadOperation},
+  kernel->AddTransportOrder({{15, tcs::kLoadOperation},
                              {16, tcs::kUnloadOperation},
                              {17, tcs::kParkOperation}});
   std::this_thread::sleep_for(std::chrono::seconds(50000000));
-  kernal->Exit();
+  kernel->Exit();
   return 0;
   // SimVehicleAdapterTest();
   // return 0;

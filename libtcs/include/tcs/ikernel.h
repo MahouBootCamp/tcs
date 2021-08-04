@@ -6,11 +6,11 @@
 
 namespace tcs {
 
-enum class KernalState { kIdle, kOperating, kExit };
+enum class KernelState { kIdle, kOperating, kExit };
 
-class IKernal {
+class IKernel {
  public:
-  virtual KernalState GetState() = 0;
+  virtual KernelState GetState() = 0;
   virtual void Start() = 0;
   virtual void Exit() = 0;
   virtual void EnableVehicle(MapObjectID vehicle, MapObjectID initial_position,
@@ -19,7 +19,7 @@ class IKernal {
       std::vector<Destination> destinations,
       std::unordered_set<TransportOrderID> dependencies = {}) = 0;
   virtual void WithdrawTransportOrder(TransportOrderID id) = 0;
-  virtual ~IKernal() {}
+  virtual ~IKernel() {}
 };
 
 }  // namespace tcs

@@ -1,18 +1,18 @@
-#include "tcs/kernal.h"
+#include "tcs/kernel.h"
 
 namespace tcs {
 
-Kernal::~Kernal() {
-  if (state_ != KernalState::kExit) Exit();
+Kernel::~Kernel() {
+  if (state_ != KernelState::kExit) Exit();
   if (monitor_.joinable()) monitor_.join();
 }
 
-void Kernal::Start() {
-  BOOST_LOG_TRIVIAL(info) << "Kernal: start operating...";
+void Kernel::Start() {
+  BOOST_LOG_TRIVIAL(info) << "Kernel: start operating...";
 
   {
     std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
-    state_ = KernalState::kOperating;
+    state_ = KernelState::kOperating;
     quit_fut_ = on_quit_.get_future();
   }
 
@@ -29,18 +29,18 @@ void Kernal::Start() {
   });
 }
 
-void Kernal::Exit() {
-  BOOST_LOG_TRIVIAL(info) << "Kernal: exiting...";
+void Kernel::Exit() {
+  BOOST_LOG_TRIVIAL(info) << "Kernel: exiting...";
   std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
-  state_ = KernalState::kExit;
+  state_ = KernelState::kExit;
   on_quit_.set_value();
 }
 
-void Kernal::EnableVehicle(MapObjectID vehicle, MapObjectID initial_position,
+void Kernel::EnableVehicle(MapObjectID vehicle, MapObjectID initial_position,
                            IVehicleAdapter* adapter) {
   std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
-  if (state_ != KernalState::kIdle)
-    throw std::runtime_error("Cannot enable vehicle while kernal running!");
+  if (state_ != KernelState::kIdle)
+    throw std::runtime_error("Cannot enable vehicle while kernel running!");
   if (controller_pool_->GetController(vehicle))
     throw std::runtime_error("Vehicle already enabled!");
   controller_pool_->AttachVehicleController(vehicle, adapter);
@@ -53,12 +53,12 @@ void Kernal::EnableVehicle(MapObjectID vehicle, MapObjectID initial_position,
                                                   IntegrationLevel::kUtilized);
 }
 
-TransportOrderID Kernal::AddTransportOrder(
+TransportOrderID Kernel::AddTransportOrder(
     std::vector<Destination> destinations,
     std::unordered_set<TransportOrderID> dependencies) {
   std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
-  if (state_ != KernalState::kOperating)
-    throw std::runtime_error("Cannot add order while kernal is not operating!");
+  if (state_ != KernelState::kOperating)
+    throw std::runtime_error("Cannot add order while kernel is not operating!");
 
   auto order_id = order_pool_->AddOrder(destinations, dependencies);
   BOOST_LOG_TRIVIAL(debug) << "Dispatch due to new order";
@@ -66,11 +66,11 @@ TransportOrderID Kernal::AddTransportOrder(
   return order_id;
 }
 
-void Kernal::WithdrawTransportOrder(TransportOrderID id) {
+void Kernel::WithdrawTransportOrder(TransportOrderID id) {
   std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
-  if (state_ != KernalState::kOperating)
+  if (state_ != KernelState::kOperating)
     throw std::runtime_error(
-        "Cannot withdraw order while kernal is not operating!");
+        "Cannot withdraw order while kernel is not operating!");
 
   auto order = transport_order_service_->GetTransportOrder(id);
   if (!order) throw std::runtime_error("Order invalid!");

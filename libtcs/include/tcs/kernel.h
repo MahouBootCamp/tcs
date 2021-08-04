@@ -8,7 +8,7 @@
 
 #include "tcs/dispatcher/default_dispatcher.h"
 #include "tcs/dispatcher/idispatcher.h"
-#include "tcs/ikernal.h"
+#include "tcs/ikernel.h"
 #include "tcs/router/default_router.h"
 #include "tcs/router/irouter.h"
 #include "tcs/scheduler/default_scheduler.h"
@@ -27,9 +27,9 @@ namespace tcs {
 constexpr std::size_t kExecutorThreads = 1;
 constexpr int kDispatchCycle = 10;  // second
 
-class Kernal : public IKernal {
+class Kernel : public IKernel {
  public:
-  Kernal(Map* map)
+  Kernel(Map* map)
       : executor_{std::make_unique<Executor>(kExecutorThreads)},
         map_{map},
         order_pool_{std::make_unique<OrderPool>(map)},
@@ -47,9 +47,9 @@ class Kernal : public IKernal {
             executor_.get(), order_pool_.get(), map_service_.get(),
             vehicle_service_.get(), transport_order_service_.get(),
             router_.get(), controller_pool_.get())} {}
-  ~Kernal();
+  ~Kernel();
 
-  KernalState GetState() override { return state_; }
+  KernelState GetState() override { return state_; }
 
   void Start() override;
 
@@ -95,7 +95,7 @@ class Kernal : public IKernal {
   std::promise<void> on_quit_;
   std::future<void> quit_fut_;
   std::thread monitor_;
-  KernalState state_ = KernalState::kIdle;
+  KernelState state_ = KernelState::kIdle;
 };
 
 }  // namespace tcs

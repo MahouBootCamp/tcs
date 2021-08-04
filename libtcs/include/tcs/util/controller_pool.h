@@ -32,7 +32,7 @@ class ControllerPool {
 
  private:
   Map* map_;  // We do not need a MapService here since change in controller
-              // pool would only happen in Kernal Idle state.
+              // pool would only happen in Kernel Idle state.
   VehicleService* vehicle_service_;
   IScheduler* scheduler_;
   std::unordered_map<MapObjectID, std::unique_ptr<IVehicleController>>

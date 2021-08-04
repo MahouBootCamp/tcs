@@ -17,7 +17,7 @@ add_library(libtcs
     src/default_dispatcher.cc
     src/default_router.cc
     src/default_scheduler.cc
-    src/kernal.cc
+    src/kernel.cc
     src/map_builder.cc
     src/map_service.cc
     src/map.cc
