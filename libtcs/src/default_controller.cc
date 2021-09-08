@@ -28,6 +28,11 @@ DefaultController::DefaultController(const Vehicle* vehicle,
   adapter_->Enable();
 }
 
+DefaultController::~DefaultController() {
+  std::scoped_lock<std::mutex> lock{vehicle_mut_};
+  if (adapter_->IsEnabled()) adapter_->Disable();
+}
+
 void DefaultController::UpdatePositionEventHandler(MapObjectRef point_ref) {
   if (point_ref.has_value()) {
     BOOST_LOG_TRIVIAL(debug)

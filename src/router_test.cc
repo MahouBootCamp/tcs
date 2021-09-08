@@ -92,7 +92,7 @@ TEST_F(RouterTest, AlgorithmTest) {
 TEST_F(RouterTest, PointToPoint) {
   auto order0 = order_pool_->AddOrder({{17, "Load"}, {18, "Unload"}});
   ASSERT_TRUE(router_->ChechRoutability(order_pool_->GetOrder(order0)));
-  auto order1 = order_pool_->AddOrder({{0, "Load"}, {6, "Unload"}});
+  auto order1 = order_pool_->AddOrder({{0, tcs::kNoOperation}, {6, tcs::kNoOperation}});
   ASSERT_FALSE(router_->ChechRoutability(order_pool_->GetOrder(order1)));
 }
 

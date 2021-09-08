@@ -3,7 +3,8 @@
 namespace tcs {
 
 Kernel::~Kernel() {
-  if (state_ != KernelState::kExit) Exit();
+  Exit();
+  executor_->Exit();
   if (monitor_.joinable()) monitor_.join();
 }
 
@@ -13,27 +14,36 @@ void Kernel::Start() {
   {
     std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
     state_ = KernelState::kOperating;
-    quit_fut_ = on_quit_.get_future();
+    // quit_fut_ = on_quit_.get_future();
   }
 
   monitor_ = std::thread([this]() {
     // if (quit_fut_.valid()) quit_fut_.wait();
-    while (quit_fut_.valid()) {
-      if (quit_fut_.wait_for(std::chrono::seconds(kDispatchCycle)) ==
-          std::future_status::timeout) {
-        BOOST_LOG_TRIVIAL(debug) << "Dispatch periodically";
-        dispatcher_->Dispatch();
-      } else
+    while (true) {
+      std::this_thread::sleep_for(std::chrono::seconds(kDispatchCycle));
+      bool exit = false;
+      {
+        std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
+        exit = state_ == KernelState::kExit;
+      }
+      if (exit) {
+        BOOST_LOG_TRIVIAL(info) << "Exit periodical dispatch task";
         break;
+      } else {
+        BOOST_LOG_TRIVIAL(info) << "Dispatch periodically";
+        dispatcher_->Dispatch();
+      }
     }
   });
 }
 
 void Kernel::Exit() {
-  BOOST_LOG_TRIVIAL(info) << "Kernel: exiting...";
-  std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
-  state_ = KernelState::kExit;
-  on_quit_.set_value();
+  {
+    std::scoped_lock<std::recursive_mutex> lock{global_mutex_};
+    if (state_ != KernelState::kOperating) return;
+    BOOST_LOG_TRIVIAL(info) << "Kernel: exiting...";
+    state_ = KernelState::kExit;
+  }
 }
 
 void Kernel::EnableVehicle(MapObjectID vehicle, MapObjectID initial_position,

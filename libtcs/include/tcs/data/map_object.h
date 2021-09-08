@@ -15,6 +15,7 @@ class MapObject {
   MapObject(MapObjectID id, MapObjectType type) : id_{id}, type_{type} {}
   MapObjectID GetID() const { return id_; }
   MapObjectType GetType() const { return type_; }
+  virtual ~MapObject() = default;
 
  private:
   MapObjectID id_;

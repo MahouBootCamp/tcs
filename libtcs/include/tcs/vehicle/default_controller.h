@@ -21,6 +21,8 @@ class DefaultController : public IVehicleController {
   DefaultController(const Vehicle* vehicle, IVehicleAdapter* adapter,
                     VehicleService* vehicle_service, IScheduler* scheduler);
 
+  ~DefaultController();
+
   MapObjectID GetVehicleID() override { return vehicle_->GetID(); }
 
   void UpdatePositionEventHandler(MapObjectRef point_ref);

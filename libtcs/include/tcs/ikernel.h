@@ -1,5 +1,5 @@
-#ifndef IKERNAL_H
-#define IKERNAL_H
+#ifndef IKERNEL_H
+#define IKERNEL_H
 
 #include "tcs/order/transport_order.h"
 #include "tcs/vehicle/ivehicle_adapter.h"
@@ -24,4 +24,4 @@ class IKernel {
 
 }  // namespace tcs
 
-#endif /* IKERNAL_H */
+#endif /* IKERNEL_H */

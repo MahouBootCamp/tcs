@@ -1,6 +1,7 @@
 #ifndef EXECUTOR_H
 #define EXECUTOR_H
 
+#include <boost/log/trivial.hpp>
 #include <functional>
 #include <future>
 #include <queue>
@@ -13,8 +14,12 @@ namespace tcs {
 class Executor {
  public:
   Executor(size_t);
+
   template <class F, class... Args>
-  decltype(auto) Submit(F&& f, Args&&... args);
+  void Submit(F&& f, Args&&... args);
+
+  void Exit();
+
   ~Executor();
 
  private:
@@ -51,29 +56,31 @@ inline Executor::Executor(size_t threads) : stop_{false} {
 
 // add new work item to the pool
 template <class F, class... Args>
-decltype(auto) Executor::Submit(F&& f, Args&&... args) {
+void Executor::Submit(F&& f, Args&&... args) {
   using return_type = std::invoke_result_t<F, Args...>;
 
   std::packaged_task<return_type()> task(
       std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 
-  std::future<return_type> res = task.get_future();
+  // std::future<return_type> res = task.get_future();
   {
     std::unique_lock<std::mutex> lock(queue_mutex_);
 
     // don't allow enqueueing after stopping the pool
-    if (stop_) throw std::runtime_error("Enqueue on stopped threadPool");
+    if (stop_) {
+      BOOST_LOG_TRIVIAL(info) << "Executor stopped. Discard new tasks.";
+      return;
+    }
 
     tasks_.emplace(std::move(task));
   }
   condition_.notify_one();
-  return res;
 }
 
-// the destructor joins all threads
-inline Executor::~Executor() {
+inline void Executor::Exit() {
   {
     std::unique_lock<std::mutex> lock(queue_mutex_);
+    if (stop_) return;
     stop_ = true;
   }
   condition_.notify_all();
@@ -81,6 +88,9 @@ inline Executor::~Executor() {
     worker.join();
   }
 }
+
+// the destructor joins all threads
+inline Executor::~Executor() { Exit(); }
 
 }  // namespace tcs
 

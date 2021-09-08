@@ -35,7 +35,10 @@ tcs::Map* BuildTestMap() {
 
 int main(int, char**) {
   auto map = BuildTestMap();
-  std::unique_ptr<tcs::IKernel> kernel = std::make_unique<tcs::Kernel>(map);
+  std::recursive_mutex global_mutex;
+
+  std::unique_ptr<tcs::IKernel> kernel =
+      std::make_unique<tcs::Kernel>(global_mutex, map);
 
   kernel->EnableVehicle(18, 2);
   kernel->EnableVehicle(19, 3);
@@ -46,9 +49,8 @@ int main(int, char**) {
   kernel->AddTransportOrder({{15, tcs::kLoadOperation},
                              {16, tcs::kUnloadOperation},
                              {17, tcs::kParkOperation}});
-  std::this_thread::sleep_for(std::chrono::seconds(50000000));
+  // // std::this_thread::sleep_for(std::chrono::seconds(50000000));
   kernel->Exit();
+
   return 0;
-  // SimVehicleAdapterTest();
-  // return 0;
 }

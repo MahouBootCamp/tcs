@@ -1,5 +1,5 @@
-#ifndef KERNAL_H
-#define KERNAL_H
+#ifndef KERNEL_H
+#define KERNEL_H
 
 #include <boost/log/trivial.hpp>
 #include <future>
@@ -29,8 +29,9 @@ constexpr int kDispatchCycle = 10;  // second
 
 class Kernel : public IKernel {
  public:
-  Kernel(Map* map)
-      : executor_{std::make_unique<Executor>(kExecutorThreads)},
+  Kernel(std::recursive_mutex& global_mutex, Map* map)
+      : global_mutex_(global_mutex),
+        executor_{std::make_unique<Executor>(kExecutorThreads)},
         map_{map},
         order_pool_{std::make_unique<OrderPool>(map)},
         map_service_{std::make_unique<MapService>(map, global_mutex_)},
@@ -64,22 +65,9 @@ class Kernel : public IKernel {
 
   void WithdrawTransportOrder(TransportOrderID id) override;
 
-  // NOTE: Following functions are for test only
-  Executor* GetExecutor() { return executor_.get(); }
-  Map* GetMap() { return map_.get(); }
-  OrderPool* GetOrderPool() { return order_pool_.get(); }
-  MapService* GetMapService() { return map_service_.get(); }
-  VehicleService* GetVehicleService() { return vehicle_service_.get(); }
-  TransportOrderService* GetTransportOrderService() {
-    return transport_order_service_.get();
-  }
-  IRouter* GetRouter() { return router_.get(); }
-  IScheduler* GetScheduler() { return scheduler_.get(); }
-  ControllerPool* GetControllerPool() { return controller_pool_.get(); }
-  IDispatcher* GetDispathcer() { return dispatcher_.get(); }
-
  private:
-  std::recursive_mutex global_mutex_;
+  KernelState state_ = KernelState::kIdle;
+  std::recursive_mutex& global_mutex_;
 
   std::unique_ptr<Executor> executor_;
   std::unique_ptr<Map> map_;
@@ -92,12 +80,11 @@ class Kernel : public IKernel {
   std::unique_ptr<ControllerPool> controller_pool_;
   std::unique_ptr<IDispatcher> dispatcher_;
 
-  std::promise<void> on_quit_;
-  std::future<void> quit_fut_;
+  //   std::promise<void> on_quit_;
+  //   std::future<void> quit_fut_ = on_quit_.get_future();
   std::thread monitor_;
-  KernelState state_ = KernelState::kIdle;
 };
 
 }  // namespace tcs
 
-#endif /* KERNAL_H */
+#endif /* KERNEL_H */
